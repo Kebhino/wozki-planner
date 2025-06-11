@@ -40,7 +40,7 @@ const NavigationBar = () => {
           fontSize={{ base: "12px", md: "16px", lg: "18px" }}
           wrap={"wrap"}
         >
-          <NavLink to="/uczestnicy">
+          <NavLink to="/">
             <Text
               position="relative"
               fontWeight={"400"}
@@ -52,10 +52,10 @@ const NavigationBar = () => {
                 left: 0,
                 width: "100%",
                 height: "2px",
-                background: isActive("/uczestnicy")
+                background: isActive("/")
                   ? "linear-gradient(90deg, #6EBEFF, #3A8DFF)"
                   : "#cce7ff",
-                opacity: isActive("/uczestnicy") ? 1 : 0.4,
+                opacity: isActive("/") ? 1 : 0.4,
                 transition: "all 0.3s ease",
               }}
               _hover={{

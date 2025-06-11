@@ -1,11 +1,11 @@
 import Layout from "../../Layout/Layout";
-import Oferta from "./Oferta";
+import TablicaUczestnikow from "../TablicaUczestnikow";
 
 const MainPage = () => {
   return (
     <>
       <Layout>
-        <Oferta />
+        <TablicaUczestnikow />
       </Layout>
     </>
   );
