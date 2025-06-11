@@ -57,7 +57,10 @@ const TablicaUczestnikow = () => {
   }
 
   const handleAddParticipant = async () => {
-    if (!newParticipant.name.trim()) {
+    if (
+      typeof newParticipant.name !== "string" ||
+      !newParticipant.name.trim()
+    ) {
       toast({
         title: "Podaj imię i nazwisko",
         status: "warning",
