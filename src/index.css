@@ -1,0 +1,15 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom, #f5faff, #5BA1D5);
+  
+  padding: 20px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.oferta-group:hover .oferta-text {
+  transform: scale(1.02);
+  transition: all 0.3s ease;
+}
+
