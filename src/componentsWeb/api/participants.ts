@@ -1,7 +1,7 @@
 import type { AddParticipantProps, Participant } from "@/componentsWeb/types/participants";
 
 export const addParticipant = async (payload: AddParticipantProps) => {
-  const res = await fetch("https://gngp5xd4ol.execute-api.eu-central-1.amazonaws.com//participants", {
+  const res = await fetch("https://gngp5xd4ol.execute-api.eu-central-1.amazonaws.com/participants", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
