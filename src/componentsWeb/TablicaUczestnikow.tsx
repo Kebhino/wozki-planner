@@ -1,22 +1,30 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  addParticipant,
   deleteParticipantFromDb,
   getParticipants,
   updateParticipantInDb,
 } from "@/componentsWeb/api/participants";
-import { Box, Button, Editable, HStack, Input, Table } from "@chakra-ui/react";
-import { chakra } from "@chakra-ui/react";
-import { createStandaloneToast } from "@chakra-ui/toast";
-import { useState } from "react";
-import { addParticipant } from "@/componentsWeb/api/participants";
-import { v4 as uuidv4 } from "uuid";
-const StyledSelect = chakra("select");
-const { ToastContainer, toast } = createStandaloneToast();
 import type {
   AddParticipantProps,
+  Participant,
   Status,
 } from "@/componentsWeb/types/participants";
-import type { Participant } from "@/componentsWeb/types/participants";
+import {
+  Box,
+  Button,
+  chakra,
+  Editable,
+  HStack,
+  Input,
+  Table,
+} from "@chakra-ui/react";
+import { createStandaloneToast } from "@chakra-ui/toast";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import SortMenu from "./SortMenu";
+const StyledSelect = chakra("select");
+const { ToastContainer, toast } = createStandaloneToast();
 
 const statusOptions: Status[] = [
   "Pionier Stały",
@@ -26,6 +34,8 @@ const statusOptions: Status[] = [
 
 const TablicaUczestnikow = () => {
   const queryClient = useQueryClient();
+  const [sortType, setSortType] = useState<"surname" | "status">("surname");
+  const [sortAsc, setSortAsc] = useState(true);
   const [newParticipant, setNewParticipant] = useState<Omit<Participant, "id">>(
     {
       name: "",
@@ -55,6 +65,22 @@ const TablicaUczestnikow = () => {
       </Box>
     );
   }
+
+  const sortedParticipants = [...participants].sort((a, b) => {
+    const sortValueA =
+      sortType === "surname"
+        ? a.name.split(" ").slice(-1)[0]
+        : a.status.toLowerCase();
+
+    const sortValueB =
+      sortType === "surname"
+        ? b.name.split(" ").slice(-1)[0]
+        : b.status.toLowerCase();
+
+    return sortAsc
+      ? sortValueA.localeCompare(sortValueB, "pl")
+      : sortValueB.localeCompare(sortValueA, "pl");
+  });
 
   const handleAddParticipant = async () => {
     if (
@@ -159,6 +185,12 @@ const TablicaUczestnikow = () => {
             }))
           }
         />
+        <SortMenu
+          sortType={sortType}
+          sortAsc={sortAsc}
+          setSortType={setSortType}
+          setSortAsc={setSortAsc}
+        />
 
         <StyledSelect
           value={newParticipant.status}
@@ -208,7 +240,7 @@ const TablicaUczestnikow = () => {
         </Table.Header>
 
         <Table.Body>
-          {participants.map((p) => (
+          {sortedParticipants.map((p) => (
             <Table.Row key={p.id}>
               <Table.Cell>
                 <Editable.Root
