@@ -1,17 +1,18 @@
 import { Box, Button, Editable, HStack, Input, Table } from "@chakra-ui/react";
-
 import { chakra } from "@chakra-ui/react";
 import { createStandaloneToast } from "@chakra-ui/toast";
 import { useState } from "react";
-
+import { addParticipant } from "@/componentsWeb/api/participants";
+import { v4 as uuidv4 } from "uuid";
 const StyledSelect = chakra("select");
-
 const { ToastContainer, toast } = createStandaloneToast();
-
-type Status = "Pionier Stały" | "Pionier Pomocniczy" | "Głosiciel";
+import type {
+  AddParticipantProps,
+  Status,
+} from "@/componentsWeb/types/participants";
 
 interface Participant {
-  id: number;
+  id: string;
   name: string;
   status: Status;
 }
@@ -31,7 +32,7 @@ const TablicaUczestnikow = () => {
     }
   );
 
-  const addParticipant = () => {
+  const handleAddParticipant = async () => {
     if (!newParticipant.name.trim()) {
       toast({
         title: "Podaj imię i nazwisko",
@@ -42,28 +43,59 @@ const TablicaUczestnikow = () => {
       return;
     }
 
-    setParticipants((prev) => [...prev, { id: Date.now(), ...newParticipant }]);
-    setNewParticipant({ name: "", status: "Głosiciel" });
+    const payload: AddParticipantProps = {
+      id: uuidv4(),
+      name: newParticipant.name,
+      status: newParticipant.status,
+    };
 
-    toast({
-      title: "Dodano uczestnika",
-      status: "success",
-      duration: 4000,
-      isClosable: true,
-    });
+    try {
+      await addParticipant(payload); // 👈 WYWOŁANIE z api/participants.ts
+
+      setParticipants((prev) => [...prev, payload]);
+      setNewParticipant({ name: "", status: "Głosiciel" });
+
+      toast({
+        title: "Dodano uczestnika",
+        status: "success",
+        duration: 4000,
+        isClosable: true,
+      });
+    } catch (err) {
+      toast({
+        title: "Błąd połączenia z API",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      console.error(err);
+    }
   };
 
   const updateParticipant = (
-    id: number,
+    id: string,
     field: keyof Participant,
     value: string
   ) => {
     setParticipants((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, [field]: value as Status } : p))
+      prev.map((p) => {
+        if (p.id !== id) return p;
+
+        if (field === "name") {
+          return { ...p, name: value };
+        }
+
+        if (field === "status") {
+          return { ...p, status: value as Status }; // jeśli kiedyś będziesz edytować status
+        }
+
+        // jeśli ktoś próbowałby zmienić id — ignorujemy
+        return p;
+      })
     );
   };
 
-  const deleteParticipant = (id: number) => {
+  const deleteParticipant = (id: string) => {
     setParticipants((prev) => prev.filter((p) => p.id !== id));
     toast({
       title: "Usunięto uczestnika",
@@ -118,7 +150,7 @@ const TablicaUczestnikow = () => {
 
         <Button
           colorScheme="green"
-          onClick={addParticipant}
+          onClick={handleAddParticipant}
           bg="white"
           color="black"
           height={10}
