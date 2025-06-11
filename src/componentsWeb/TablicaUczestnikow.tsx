@@ -1,3 +1,9 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  deleteParticipantFromDb,
+  getParticipants,
+  updateParticipantInDb,
+} from "@/componentsWeb/api/participants";
 import { Box, Button, Editable, HStack, Input, Table } from "@chakra-ui/react";
 import { chakra } from "@chakra-ui/react";
 import { createStandaloneToast } from "@chakra-ui/toast";
@@ -10,12 +16,7 @@ import type {
   AddParticipantProps,
   Status,
 } from "@/componentsWeb/types/participants";
-
-interface Participant {
-  id: string;
-  name: string;
-  status: Status;
-}
+import type { Participant } from "@/componentsWeb/types/participants";
 
 const statusOptions: Status[] = [
   "Pionier Stały",
@@ -24,13 +25,36 @@ const statusOptions: Status[] = [
 ];
 
 const TablicaUczestnikow = () => {
-  const [participants, setParticipants] = useState<Participant[]>([]);
+  const queryClient = useQueryClient();
   const [newParticipant, setNewParticipant] = useState<Omit<Participant, "id">>(
     {
       name: "",
       status: "Głosiciel",
     }
   );
+
+  const {
+    data: participants = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery<Participant[]>({
+    queryKey: ["participants"],
+    queryFn: getParticipants,
+    staleTime: 1000 * 60 * 5, // 5 min cache
+  });
+
+  if (isLoading) {
+    return <p>Ładowanie danych uczestników...</p>;
+  }
+
+  if (isError) {
+    return (
+      <Box>
+        <p>Błąd wczytywania danych: {(error as Error).message}</p>
+      </Box>
+    );
+  }
 
   const handleAddParticipant = async () => {
     if (!newParticipant.name.trim()) {
@@ -52,7 +76,7 @@ const TablicaUczestnikow = () => {
     try {
       await addParticipant(payload); // 👈 WYWOŁANIE z api/participants.ts
 
-      setParticipants((prev) => [...prev, payload]);
+      queryClient.invalidateQueries({ queryKey: ["participants"] });
       setNewParticipant({ name: "", status: "Głosiciel" });
 
       toast({
@@ -72,37 +96,43 @@ const TablicaUczestnikow = () => {
     }
   };
 
-  const updateParticipant = (
+  const updateParticipant = async (
     id: string,
     field: keyof Participant,
     value: string
   ) => {
-    setParticipants((prev) =>
-      prev.map((p) => {
-        if (p.id !== id) return p;
-
-        if (field === "name") {
-          return { ...p, name: value };
-        }
-
-        if (field === "status") {
-          return { ...p, status: value as Status }; // jeśli kiedyś będziesz edytować status
-        }
-
-        // jeśli ktoś próbowałby zmienić id — ignorujemy
-        return p;
-      })
-    );
+    try {
+      await updateParticipantInDb(id, field, value);
+      queryClient.invalidateQueries({ queryKey: ["participants"] });
+    } catch (error) {
+      toast({
+        title: "Błąd aktualizacji",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
-  const deleteParticipant = (id: string) => {
-    setParticipants((prev) => prev.filter((p) => p.id !== id));
-    toast({
-      title: "Usunięto uczestnika",
-      status: "info",
-      duration: 2000,
-      isClosable: true,
-    });
+  const deleteParticipant = async (id: string) => {
+    try {
+      await deleteParticipantFromDb(id);
+      toast({
+        title: "Uczestnik usunięty",
+        status: "info",
+        duration: 3000,
+        isClosable: true,
+      });
+      queryClient.invalidateQueries({ queryKey: ["participants"] });
+    } catch (error) {
+      toast({
+        title: "Błąd usuwania uczestnika",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      console.error(error);
+    }
   };
 
   return (

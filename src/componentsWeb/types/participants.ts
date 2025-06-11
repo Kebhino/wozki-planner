@@ -6,3 +6,8 @@ export interface AddParticipantProps {
   status: Status;
 }
 
+export interface Participant {
+  id: string;
+  name: string;
+  status: Status;
+}
