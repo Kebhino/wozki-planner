@@ -17,12 +17,14 @@ import {
   HStack,
   Input,
   Table,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { createStandaloneToast } from "@chakra-ui/toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import SortMenu from "./SortMenu";
+import type { ToastPosition } from "@chakra-ui/toast";
 const StyledSelect = chakra("select");
 const { ToastContainer, toast } = createStandaloneToast();
 
@@ -36,6 +38,10 @@ const TablicaUczestnikow = () => {
   const queryClient = useQueryClient();
   const [sortType, setSortType] = useState<"surname" | "status">("surname");
   const [sortAsc, setSortAsc] = useState(true);
+  const position = useBreakpointValue({
+    base: "top",
+    lg: "bottom",
+  }) as ToastPosition;
   const [newParticipant, setNewParticipant] = useState<Omit<Participant, "id">>(
     {
       name: "",
@@ -91,7 +97,9 @@ const TablicaUczestnikow = () => {
         title: "Podaj imię i nazwisko",
         status: "warning",
         duration: 3000,
+        position,
         isClosable: true,
+        variant: "subtle",
       });
       return;
     }
@@ -113,6 +121,8 @@ const TablicaUczestnikow = () => {
         status: "success",
         duration: 4000,
         isClosable: true,
+        position,
+        variant: "subtle",
       });
     } catch (err) {
       toast({
@@ -120,6 +130,8 @@ const TablicaUczestnikow = () => {
         status: "error",
         duration: 3000,
         isClosable: true,
+        position,
+        variant: "subtle",
       });
       console.error(err);
     }
@@ -138,7 +150,9 @@ const TablicaUczestnikow = () => {
         title: "Błąd aktualizacji",
         status: "error",
         duration: 3000,
+        position,
         isClosable: true,
+        variant: "subtle",
       });
     }
   };
@@ -150,6 +164,7 @@ const TablicaUczestnikow = () => {
         title: "Uczestnik usunięty",
         status: "info",
         duration: 3000,
+        position,
         isClosable: true,
       });
       queryClient.invalidateQueries({ queryKey: ["participants"] });
@@ -158,6 +173,7 @@ const TablicaUczestnikow = () => {
         title: "Błąd usuwania uczestnika",
         status: "error",
         duration: 3000,
+        position,
         isClosable: true,
       });
       console.error(error);
