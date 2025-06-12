@@ -244,10 +244,12 @@ const TablicaUczestnikow = () => {
             <Table.Row key={p.id}>
               <Table.Cell>
                 <Editable.Root
-                  value={p.name}
-                  onValueChange={(val) =>
-                    updateParticipant(p.id, "name", val.value)
-                  }
+                  defaultValue={p.name}
+                  onValueCommit={(val) => {
+                    console.log(val);
+                    updateParticipant(p.id, "name", val.value);
+                  }}
+                  submitMode="enter"
                 >
                   <Editable.Preview />
                   <Editable.Input />
@@ -255,7 +257,7 @@ const TablicaUczestnikow = () => {
               </Table.Cell>
               <Table.Cell>
                 <StyledSelect
-                  value={p.status}
+                  defaultValue={p.status}
                   onChange={(e) =>
                     updateParticipant(p.id, "status", e.target.value)
                   }
