@@ -235,6 +235,7 @@ const TablicaUczestnikow = () => {
           value={newParticipant.status}
           bg="white"
           color="black"
+          fontSize={{ base: 8, md: 12, lg: 15 }}
           height={10}
           textAlign={"center"}
           borderRadius={5}
@@ -258,6 +259,7 @@ const TablicaUczestnikow = () => {
           bg="white"
           color="black"
           height={10}
+          fontSize={{ base: 8, md: 12, lg: 15 }}
           textAlign={"center"}
           borderRadius={10}
           _hover={{ bg: "green.400", color: "white" }}

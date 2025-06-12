@@ -8,8 +8,4 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-.oferta-group:hover .oferta-text {
-  transform: scale(1.02);
-  transition: all 0.3s ease;
-}
 
