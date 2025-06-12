@@ -11,3 +11,8 @@ export interface Participant {
   name: string;
   status: Status;
 }
+
+export interface SortConfig {
+  type: "surname" | "status";
+  direction: "asc" | "desc";
+}

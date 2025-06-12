@@ -7,6 +7,7 @@ import {
 import type {
   AddParticipantProps,
   Participant,
+  SortConfig,
   Status,
 } from "@/componentsWeb/types/participants";
 import {
@@ -19,12 +20,12 @@ import {
   Table,
   useBreakpointValue,
 } from "@chakra-ui/react";
+import type { ToastPosition } from "@chakra-ui/toast";
 import { createStandaloneToast } from "@chakra-ui/toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import SortMenu from "./SortMenu";
-import type { ToastPosition } from "@chakra-ui/toast";
+import SortableColumnHeader from "./SortowanieWKolumnie";
 const StyledSelect = chakra("select");
 const { ToastContainer, toast } = createStandaloneToast();
 
@@ -36,8 +37,10 @@ const statusOptions: Status[] = [
 
 const TablicaUczestnikow = () => {
   const queryClient = useQueryClient();
-  const [sortType, setSortType] = useState<"surname" | "status">("surname");
-  const [sortAsc, setSortAsc] = useState(true);
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
+    type: "surname",
+    direction: "asc",
+  });
   const position = useBreakpointValue({
     base: "top",
     lg: "bottom",
@@ -73,20 +76,40 @@ const TablicaUczestnikow = () => {
   }
 
   const sortedParticipants = [...participants].sort((a, b) => {
-    const sortValueA =
-      sortType === "surname"
-        ? a.name.split(" ").slice(-1)[0]
+    const { type, direction } = sortConfig;
+
+    const valA =
+      type === "surname"
+        ? a.name.split(" ").slice(-1)[0].toLowerCase()
         : a.status.toLowerCase();
 
-    const sortValueB =
-      sortType === "surname"
-        ? b.name.split(" ").slice(-1)[0]
+    const valB =
+      type === "surname"
+        ? b.name.split(" ").slice(-1)[0].toLowerCase()
         : b.status.toLowerCase();
 
-    return sortAsc
-      ? sortValueA.localeCompare(sortValueB, "pl")
-      : sortValueB.localeCompare(sortValueA, "pl");
+    return direction === "asc"
+      ? valA.localeCompare(valB, "pl")
+      : valB.localeCompare(valA, "pl");
   });
+
+  const handleSortChange = (type: "surname" | "status") => {
+    setSortConfig((prev) => {
+      if (prev.type === type) {
+        // Jeśli kliniemy w tą samą kolumne to zmieni się kierunek sortowania
+        return {
+          ...prev,
+          direction: prev.direction === "asc" ? "desc" : "asc",
+        };
+      } else {
+        // Jeśli klikniemy inną kolumne to przełączamy się na nią i ustawiany domyślny kierunek
+        return {
+          type,
+          direction: "asc",
+        };
+      }
+    });
+  };
 
   const handleAddParticipant = async () => {
     if (
@@ -201,12 +224,12 @@ const TablicaUczestnikow = () => {
             }))
           }
         />
-        <SortMenu
+        {/* <SortMenu
           sortType={sortType}
           sortAsc={sortAsc}
           setSortType={setSortType}
           setSortAsc={setSortAsc}
-        />
+        /> */}
 
         <StyledSelect
           value={newParticipant.status}
@@ -248,9 +271,23 @@ const TablicaUczestnikow = () => {
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeader fontWeight={"bold"}>
-              Imię i nazwisko
+              <SortableColumnHeader
+                label="Imię i nazwisko"
+                sortKey="surname"
+                currentSort={sortConfig.type}
+                sortAsc={sortConfig.direction === "asc"}
+                onSortChange={handleSortChange}
+              />
             </Table.ColumnHeader>
-            <Table.ColumnHeader>Status</Table.ColumnHeader>
+            <Table.ColumnHeader>
+              <SortableColumnHeader
+                label="Status"
+                sortKey="status"
+                currentSort={sortConfig.type}
+                sortAsc={sortConfig.direction === "asc"}
+                onSortChange={handleSortChange}
+              />
+            </Table.ColumnHeader>
             <Table.ColumnHeader>Akcje</Table.ColumnHeader>
           </Table.Row>
         </Table.Header>

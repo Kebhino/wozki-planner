@@ -1,7 +1,6 @@
 // src/pages/Contact.tsx
 import { Box, Button, Heading, Text, VStack } from "@chakra-ui/react";
 import { NavLink } from "./NavLink";
-import SectorsTexT from "./MainPage/OfertaTextComp";
 
 const ONasElemenent = () => {
   return (
@@ -27,9 +26,7 @@ const ONasElemenent = () => {
             transition: "all 0.1s ease", // mocniejszy cień na hover
           }}
         >
-          <Heading as={"h1"} size="lg" mb={4} color="blue.500">
-            <SectorsTexT sectorname={"O Nas"} />
-          </Heading>
+          <Heading as={"h1"} size="lg" mb={4} color="blue.500"></Heading>
           <VStack gap={4} align="start" textAlign={"left"} pt={5}>
             <Text fontSize="lg" color="gray.700" as={"h2"}>
               Systemami informatycznymi zajmujemy się od <b>2002 roku</b>, gdy
