@@ -404,12 +404,15 @@ const TablicaUczestnikow = () => {
                         <Dialog.Body>
                           Czy jesteś pewien, że chcesz usunąć uczestnika:{" "}
                           <Text fontWeight={"bold"} textAlign={"center"} mt={5}>
-                            {
-                              sortedParticipants.find(
-                                (uczestnik) => uczestnik.id === p.id
-                              )?.name
-                            }
+                            {p.name}
                           </Text>
+                          {p.active && (
+                            <Text textAlign={"center"} color={"red"} pt={5}>
+                              {p.active
+                                ? `Uczesnik ${p.name} jest oznaczony jako aktywny`
+                                : null}
+                            </Text>
+                          )}
                         </Dialog.Body>
                         <Dialog.Footer>
                           <Dialog.ActionTrigger asChild>
