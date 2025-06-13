@@ -27,6 +27,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { LuCheck, LuPencilLine, LuX } from "react-icons/lu";
 import { MdOutlineDeleteForever } from "react-icons/md";
+import { IoMdAdd } from "react-icons/io";
 import { v4 as uuidv4 } from "uuid";
 import SortableColumnHeader from "./SortowanieWKolumnie";
 const StyledSelect = chakra("select");
@@ -238,7 +239,7 @@ const TablicaUczestnikow = () => {
           value={newParticipant.status}
           bg="white"
           color="black"
-          fontSize={{ base: 8, md: 12, lg: 15 }}
+          fontSize={{ base: 10, md: 12, lg: 15 }}
           height={10}
           textAlign={"center"}
           borderRadius={5}
@@ -267,7 +268,7 @@ const TablicaUczestnikow = () => {
           borderRadius={10}
           _hover={{ bg: "green.400", color: "white" }}
         >
-          ADD
+          <IoMdAdd />
         </Button>
       </HStack>
 
@@ -316,7 +317,6 @@ const TablicaUczestnikow = () => {
                       <IconButton
                         variant="ghost"
                         size="xs"
-                        bg={"green.300"}
                         borderRadius={"full"}
                         _hover={{
                           bg: "green.500",
