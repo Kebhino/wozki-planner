@@ -141,7 +141,7 @@ const TablicaUczestnikow = () => {
       await addParticipant(payload); // 👈 WYWOŁANIE z api/participants.ts
 
       queryClient.invalidateQueries({ queryKey: ["participants"] });
-      setNewParticipant({ name: "", status: "Głosiciel", active: false });
+      setNewParticipant({ name: "", status: "Głosiciel", active: true });
 
       toast({
         title: "Dodano uczestnika",
@@ -304,13 +304,12 @@ const TablicaUczestnikow = () => {
               <Table.Cell>
                 <Editable.Root
                   defaultValue={p.name}
-                  display="flex"
                   onValueCommit={(val) => {
                     updateParticipant(p.id, "name", val.value);
                   }}
                   submitMode="enter"
                 >
-                  <Editable.Preview flex="1" />
+                  <Editable.Preview />
                   <Editable.Input />
                   <Editable.Control>
                     <Editable.EditTrigger asChild>
