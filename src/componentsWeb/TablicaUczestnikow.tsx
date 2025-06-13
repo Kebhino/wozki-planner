@@ -362,9 +362,10 @@ const TablicaUczestnikow = () => {
                   ))}
                 </StyledSelect>
               </Table.Cell>
-              <Table.Cell>
+              <Table.Cell textAlign="right">
                 <Button
                   size="sm"
+                  mr={2}
                   borderRadius={5}
                   bg={"red.600"}
                   onClick={() => deleteParticipant(p.id)}
