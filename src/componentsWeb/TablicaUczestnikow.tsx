@@ -408,7 +408,7 @@ const TablicaUczestnikow = () => {
                           </Text>
                           {p.active && (
                             <Text textAlign={"center"} color={"red"} pt={5}>
-                              Uczesnik {p.name} jest oznaczony jako aktywny
+                              <b>{p.name}</b> jest oznaczony jako aktywny
                             </Text>
                           )}
                         </Dialog.Body>
