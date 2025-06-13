@@ -21,7 +21,7 @@ export const getParticipants = async () => {
 export const updateParticipantInDb = async (
   id: string,
   field: keyof Participant,
-  value: string
+  value: string | boolean
 ) => {
   const res = await fetch(
     `https://gngp5xd4ol.execute-api.eu-central-1.amazonaws.com/participants/${id}`,

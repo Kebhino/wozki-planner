@@ -25,6 +25,7 @@ import type { ToastPosition } from "@chakra-ui/toast";
 import { createStandaloneToast } from "@chakra-ui/toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { Switch } from "@chakra-ui/react";
 import { LuCheck, LuPencilLine, LuX } from "react-icons/lu";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { IoMdAdd } from "react-icons/io";
@@ -33,11 +34,7 @@ import SortableColumnHeader from "./SortowanieWKolumnie";
 const StyledSelect = chakra("select");
 const { ToastContainer, toast } = createStandaloneToast();
 
-const statusOptions: Status[] = [
-  "Pionier Stały",
-  "Pionier Pomocniczy",
-  "Głosiciel",
-];
+const statusOptions: Status[] = ["Pionier St.", "Pionier Pom.", "Głosiciel"];
 
 const TablicaUczestnikow = () => {
   const queryClient = useQueryClient();
@@ -45,6 +42,7 @@ const TablicaUczestnikow = () => {
     type: "surname",
     direction: "asc",
   });
+
   const position = useBreakpointValue({
     base: "top",
     lg: "bottom",
@@ -53,6 +51,7 @@ const TablicaUczestnikow = () => {
     {
       name: "",
       status: "Głosiciel",
+      active: true,
     }
   );
 
@@ -133,6 +132,7 @@ const TablicaUczestnikow = () => {
 
     const payload: AddParticipantProps = {
       id: uuidv4(),
+      active: newParticipant.active,
       name: newParticipant.name,
       status: newParticipant.status,
     };
@@ -141,7 +141,7 @@ const TablicaUczestnikow = () => {
       await addParticipant(payload); // 👈 WYWOŁANIE z api/participants.ts
 
       queryClient.invalidateQueries({ queryKey: ["participants"] });
-      setNewParticipant({ name: "", status: "Głosiciel" });
+      setNewParticipant({ name: "", status: "Głosiciel", active: false });
 
       toast({
         title: "Dodano uczestnika",
@@ -167,7 +167,7 @@ const TablicaUczestnikow = () => {
   const updateParticipant = async (
     id: string,
     field: keyof Participant,
-    value: string
+    value: string | boolean
   ) => {
     try {
       await updateParticipantInDb(id, field, value);
@@ -273,7 +273,7 @@ const TablicaUczestnikow = () => {
       </HStack>
 
       {/* Tabela */}
-      <Table.Root width="100%" mt={3} color={"black"}>
+      <Table.Root width="100%" mt={3} color={"black"} interactive>
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeader fontWeight={"bold"}>
@@ -361,6 +361,18 @@ const TablicaUczestnikow = () => {
                     </option>
                   ))}
                 </StyledSelect>
+                <Switch.Root ml={5} colorPalette={"green"} checked={p.active}>
+                  <Switch.HiddenInput
+                    onChange={(e) => {
+                      const newValue = e.target.checked;
+                      updateParticipant(p.id, "active", newValue);
+                    }}
+                  />
+                  <Switch.Control>
+                    <Switch.Thumb />
+                  </Switch.Control>
+                  <Switch.Label />
+                </Switch.Root>
               </Table.Cell>
               <Table.Cell textAlign="right">
                 <Button
