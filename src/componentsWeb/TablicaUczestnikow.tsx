@@ -16,6 +16,7 @@ import {
   chakra,
   Editable,
   HStack,
+  IconButton,
   Input,
   Table,
   useBreakpointValue,
@@ -24,6 +25,8 @@ import type { ToastPosition } from "@chakra-ui/toast";
 import { createStandaloneToast } from "@chakra-ui/toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { LuCheck, LuPencilLine, LuX } from "react-icons/lu";
+import { MdOutlineDeleteForever } from "react-icons/md";
 import { v4 as uuidv4 } from "uuid";
 import SortableColumnHeader from "./SortowanieWKolumnie";
 const StyledSelect = chakra("select");
@@ -300,14 +303,49 @@ const TablicaUczestnikow = () => {
               <Table.Cell>
                 <Editable.Root
                   defaultValue={p.name}
+                  display="flex"
                   onValueCommit={(val) => {
-                    console.log(val);
                     updateParticipant(p.id, "name", val.value);
                   }}
                   submitMode="enter"
                 >
-                  <Editable.Preview />
+                  <Editable.Preview flex="1" />
                   <Editable.Input />
+                  <Editable.Control>
+                    <Editable.EditTrigger asChild>
+                      <IconButton
+                        variant="ghost"
+                        size="xs"
+                        bg={"green.300"}
+                        borderRadius={"full"}
+                        _hover={{
+                          bg: "green.500",
+                        }}
+                      >
+                        <LuPencilLine />
+                      </IconButton>
+                    </Editable.EditTrigger>
+                    <Editable.CancelTrigger asChild>
+                      <IconButton
+                        variant="outline"
+                        size="xs"
+                        bg={"red.300"}
+                        borderRadius={10}
+                      >
+                        <LuX />
+                      </IconButton>
+                    </Editable.CancelTrigger>
+                    <Editable.SubmitTrigger asChild>
+                      <IconButton
+                        variant="outline"
+                        size="xs"
+                        bg={"green.300"}
+                        borderRadius={10}
+                      >
+                        <LuCheck />
+                      </IconButton>
+                    </Editable.SubmitTrigger>
+                  </Editable.Control>
                 </Editable.Root>
               </Table.Cell>
               <Table.Cell>
@@ -328,13 +366,13 @@ const TablicaUczestnikow = () => {
                 <Button
                   size="sm"
                   borderRadius={5}
-                  bg={"red"}
+                  bg={"red.600"}
                   onClick={() => deleteParticipant(p.id)}
                   _hover={{ bg: "red", color: "white" }}
                   transition="all 0.2s"
                   _active={{ transform: "scale(0.95)", bg: "red.600" }}
                 >
-                  DELETE
+                  <MdOutlineDeleteForever />
                 </Button>
               </Table.Cell>
             </Table.Row>

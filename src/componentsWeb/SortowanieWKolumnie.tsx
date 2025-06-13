@@ -19,7 +19,11 @@ const SortableColumnHeader = ({
   onSortChange,
 }: SortableColumnHeaderProps) => {
   const isActive = currentSort === sortKey;
-  const icon = sortAsc ? MdArrowDropUp : MdArrowDropDown;
+  const icon = isActive
+    ? sortAsc
+      ? MdArrowDropUp
+      : MdArrowDropDown
+    : MdArrowDropUp;
 
   return (
     <HStack
