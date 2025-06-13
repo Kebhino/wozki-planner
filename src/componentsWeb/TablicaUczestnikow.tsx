@@ -328,7 +328,7 @@ const TablicaUczestnikow = () => {
                       <IconButton
                         variant="outline"
                         size="xs"
-                        bg={"red.300"}
+                        color={"red.600"}
                         borderRadius={10}
                       >
                         <LuX />
@@ -338,7 +338,7 @@ const TablicaUczestnikow = () => {
                       <IconButton
                         variant="outline"
                         size="xs"
-                        bg={"green.300"}
+                        color={"green.500"}
                         borderRadius={10}
                       >
                         <LuCheck />
