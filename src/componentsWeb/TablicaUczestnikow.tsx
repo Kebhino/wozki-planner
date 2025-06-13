@@ -18,8 +18,12 @@ import {
   HStack,
   IconButton,
   Input,
+  CloseButton,
+  Dialog,
+  Portal,
   Table,
   useBreakpointValue,
+  Text,
 } from "@chakra-ui/react";
 import type { ToastPosition } from "@chakra-ui/toast";
 import { createStandaloneToast } from "@chakra-ui/toast";
@@ -374,18 +378,55 @@ const TablicaUczestnikow = () => {
                 </Switch.Root>
               </Table.Cell>
               <Table.Cell textAlign="right">
-                <Button
-                  size="sm"
-                  mr={2}
-                  borderRadius={5}
-                  bg={"red.600"}
-                  onClick={() => deleteParticipant(p.id)}
-                  _hover={{ bg: "red", color: "white" }}
-                  transition="all 0.2s"
-                  _active={{ transform: "scale(0.95)", bg: "red.600" }}
-                >
-                  <MdOutlineDeleteForever />
-                </Button>
+                <Dialog.Root role="alertdialog">
+                  <Dialog.Trigger asChild>
+                    <Button
+                      size="sm"
+                      mr={2}
+                      borderRadius={5}
+                      bg={"red.600"}
+                      _hover={{ bg: "red", color: "white" }}
+                      transition="all 0.2s"
+                      _active={{ transform: "scale(0.95)", bg: "red.600" }}
+                    >
+                      <MdOutlineDeleteForever />
+                    </Button>
+                  </Dialog.Trigger>
+                  <Portal>
+                    <Dialog.Backdrop />
+                    <Dialog.Positioner>
+                      <Dialog.Content>
+                        <Dialog.Header>
+                          <Dialog.Title>Jesteś pewien?</Dialog.Title>
+                        </Dialog.Header>
+                        <Dialog.Body>
+                          Czy jesteś pewien, że chcesz usunąć uczestnika:{" "}
+                          <Text fontWeight={"bold"} textAlign={"center"} mt={5}>
+                            {
+                              sortedParticipants.find(
+                                (uczestnik) => uczestnik.id === p.id
+                              )?.name
+                            }
+                          </Text>
+                        </Dialog.Body>
+                        <Dialog.Footer>
+                          <Dialog.ActionTrigger asChild>
+                            <Button variant="outline">Nie</Button>
+                          </Dialog.ActionTrigger>
+                          <Button
+                            colorPalette="red"
+                            onClick={() => deleteParticipant(p.id)}
+                          >
+                            Tak
+                          </Button>
+                        </Dialog.Footer>
+                        <Dialog.CloseTrigger asChild>
+                          <CloseButton size="sm" />
+                        </Dialog.CloseTrigger>
+                      </Dialog.Content>
+                    </Dialog.Positioner>
+                  </Portal>
+                </Dialog.Root>
               </Table.Cell>
             </Table.Row>
           ))}
