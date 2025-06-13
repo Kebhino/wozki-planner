@@ -352,30 +352,32 @@ const TablicaUczestnikow = () => {
                 </Editable.Root>
               </Table.Cell>
               <Table.Cell>
-                <StyledSelect
-                  defaultValue={p.status}
-                  onChange={(e) =>
-                    updateParticipant(p.id, "status", e.target.value)
-                  }
-                >
-                  {statusOptions.map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </StyledSelect>
-                <Switch.Root ml={5} colorPalette={"green"} checked={p.active}>
-                  <Switch.HiddenInput
-                    onChange={(e) => {
-                      const newValue = e.target.checked;
-                      updateParticipant(p.id, "active", newValue);
-                    }}
-                  />
-                  <Switch.Control>
-                    <Switch.Thumb />
-                  </Switch.Control>
-                  <Switch.Label />
-                </Switch.Root>
+                <HStack>
+                  <StyledSelect
+                    defaultValue={p.status}
+                    onChange={(e) =>
+                      updateParticipant(p.id, "status", e.target.value)
+                    }
+                  >
+                    {statusOptions.map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </StyledSelect>
+                  <Switch.Root ml={5} colorPalette={"green"} checked={p.active}>
+                    <Switch.HiddenInput
+                      onChange={(e) => {
+                        const newValue = e.target.checked;
+                        updateParticipant(p.id, "active", newValue);
+                      }}
+                    />
+                    <Switch.Control>
+                      <Switch.Thumb />
+                    </Switch.Control>
+                    <Switch.Label />
+                  </Switch.Root>
+                </HStack>
               </Table.Cell>
               <Table.Cell textAlign="right">
                 <Dialog.Root role="alertdialog">
