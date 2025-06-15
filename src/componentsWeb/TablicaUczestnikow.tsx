@@ -363,6 +363,7 @@ const TablicaUczestnikow = () => {
                 <HStack>
                   <StyledSelect
                     defaultValue={p.status}
+                    disabled={editingUSerID.includes(p.id)}
                     onChange={(e) =>
                       updateParticipant(p.id, "status", e.target.value)
                     }
