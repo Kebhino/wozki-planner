@@ -377,6 +377,7 @@ const TablicaUczestnikow = () => {
                       </option>
                     ))}
                   </StyledSelect>
+                  {editingUSerID === p.id? <Spinner/> :
                   <Switch.Root ml={5} colorPalette={"green"} checked={p.active}>
                     <Switch.HiddenInput
                       onChange={(e) => {
@@ -388,11 +389,11 @@ const TablicaUczestnikow = () => {
                       <Switch.Thumb />
                     </Switch.Control>
                     <Switch.Label />
-                  </Switch.Root>
+                  </Switch.Root>}
                 </HStack>
               </Table.Cell>
               <Table.Cell textAlign="right">
-              {!isLoadingState && 
+              {editingUSerID === p.id? <Spinner/> :
                 <Dialog.Root role="alertdialog">
                   <Dialog.Trigger asChild>
                     <Button
