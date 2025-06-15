@@ -24,6 +24,7 @@ import {
   Table,
   useBreakpointValue,
   Text,
+  Spinner,
 } from "@chakra-ui/react";
 import type { ToastPosition } from "@chakra-ui/toast";
 import { createStandaloneToast } from "@chakra-ui/toast";
@@ -394,58 +395,72 @@ const TablicaUczestnikow = () => {
                   </Switch.Root>
                 </HStack>
               </Table.Cell>
-              <Table.Cell textAlign="right">
-                <Dialog.Root role="alertdialog">
-                  <Dialog.Trigger asChild>
-                    <Button
-                      size="sm"
-                      mr={2}
-                      borderRadius={5}
-                      disabled={editingUSerID.includes(p.id)}
-                      bg={"red.600"}
-                      _hover={{ bg: "red", color: "white" }}
-                      transition="all 0.2s"
-                      _active={{ transform: "scale(0.95)", bg: "red.600" }}
-                    >
-                      <MdOutlineDeleteForever />
-                    </Button>
-                  </Dialog.Trigger>
-                  <Portal>
-                    <Dialog.Backdrop />
-                    <Dialog.Positioner>
-                      <Dialog.Content>
-                        <Dialog.Header>
-                          <Dialog.Title>Jesteś pewien?</Dialog.Title>
-                        </Dialog.Header>
-                        <Dialog.Body>
-                          Czy jesteś pewien, że chcesz usunąć uczestnika:{" "}
-                          <Text fontWeight={"bold"} textAlign={"center"} mt={5}>
-                            {p.name}
-                          </Text>
-                          {p.active && (
-                            <Text textAlign={"center"} color={"red"} pt={5}>
-                              <b>{p.name}</b> jest oznaczony jako aktywny
+              <Table.Cell
+                display="flex"
+                alignItems="center"
+                justifyContent="flex-end"
+              >
+                {editingUSerID.includes(p.id) && (
+                  <Spinner boxSize={5} mr={5} alignItems={"center"} />
+                )}
+                {!editingUSerID.includes(p.id) && (
+                  <Dialog.Root role="alertdialog">
+                    <Dialog.Trigger asChild>
+                      <Button
+                        size="sm"
+                        mr={2}
+                        borderRadius={5}
+                        disabled={editingUSerID.includes(p.id)}
+                        color={"red.600"}
+                        bg={"white"}
+                        _hover={{ bg: "red", color: "white" }}
+                        transition="all 0.2s"
+                        _active={{ transform: "scale(0.95)", bg: "red.600" }}
+                      >
+                        <MdOutlineDeleteForever />
+                      </Button>
+                    </Dialog.Trigger>
+                    <Portal>
+                      <Dialog.Backdrop />
+                      <Dialog.Positioner>
+                        <Dialog.Content>
+                          <Dialog.Header>
+                            <Dialog.Title>Jesteś pewien?</Dialog.Title>
+                          </Dialog.Header>
+                          <Dialog.Body>
+                            Czy jesteś pewien, że chcesz usunąć uczestnika:{" "}
+                            <Text
+                              fontWeight={"bold"}
+                              textAlign={"center"}
+                              mt={5}
+                            >
+                              {p.name}
                             </Text>
-                          )}
-                        </Dialog.Body>
-                        <Dialog.Footer>
-                          <Dialog.ActionTrigger asChild>
-                            <Button variant="outline">Nie</Button>
-                          </Dialog.ActionTrigger>
-                          <Button
-                            colorPalette="red"
-                            onClick={() => deleteParticipant(p.id)}
-                          >
-                            Tak
-                          </Button>
-                        </Dialog.Footer>
-                        <Dialog.CloseTrigger asChild>
-                          <CloseButton size="sm" />
-                        </Dialog.CloseTrigger>
-                      </Dialog.Content>
-                    </Dialog.Positioner>
-                  </Portal>
-                </Dialog.Root>
+                            {p.active && (
+                              <Text textAlign={"center"} color={"red"} pt={5}>
+                                <b>{p.name}</b> jest oznaczony jako aktywny
+                              </Text>
+                            )}
+                          </Dialog.Body>
+                          <Dialog.Footer>
+                            <Dialog.ActionTrigger asChild>
+                              <Button variant="outline">Nie</Button>
+                            </Dialog.ActionTrigger>
+                            <Button
+                              colorPalette="red"
+                              onClick={() => deleteParticipant(p.id)}
+                            >
+                              Tak
+                            </Button>
+                          </Dialog.Footer>
+                          <Dialog.CloseTrigger asChild>
+                            <CloseButton size="sm" />
+                          </Dialog.CloseTrigger>
+                        </Dialog.Content>
+                      </Dialog.Positioner>
+                    </Portal>
+                  </Dialog.Root>
+                )}
               </Table.Cell>
             </Table.Row>
           ))}
