@@ -24,6 +24,7 @@ import {
   Table,
   useBreakpointValue,
   Text,
+  Spinner,
 } from "@chakra-ui/react";
 import type { ToastPosition } from "@chakra-ui/toast";
 import { createStandaloneToast } from "@chakra-ui/toast";
@@ -58,6 +59,8 @@ const TablicaUczestnikow = () => {
       active: true,
     }
   );
+  const [isLoadingState, setisLoading] = useState(false)
+  const [editingUSerID, setEditingUserid] = useState('')
 
   const {
     data: participants = [],
@@ -173,6 +176,8 @@ const TablicaUczestnikow = () => {
     field: keyof Participant,
     value: string | boolean
   ) => {
+    setisLoading(true)
+    setEditingUserid(id)
     try {
       await updateParticipantInDb(id, field, value);
       queryClient.invalidateQueries({ queryKey: ["participants"] });
@@ -186,6 +191,8 @@ const TablicaUczestnikow = () => {
         variant: "subtle",
       });
     }
+    setisLoading(false)
+    setEditingUserid('')
   };
 
   const deleteParticipant = async (id: string) => {
@@ -214,6 +221,8 @@ const TablicaUczestnikow = () => {
   return (
     <Box pt={4}>
       <ToastContainer />
+      
+
 
       {/* Formularz */}
       <HStack gap={2}>
@@ -277,7 +286,7 @@ const TablicaUczestnikow = () => {
       </HStack>
 
       {/* Tabela */}
-      <Table.Root width="100%" mt={3} color={"black"} interactive>
+      <Table.Root width="100%" mt={3} color={"black"} interactive pointerEvents={isLoadingState ? "none" : "auto"}>
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeader fontWeight={"bold"}>
@@ -305,9 +314,12 @@ const TablicaUczestnikow = () => {
         <Table.Body>
           {sortedParticipants.map((p) => (
             <Table.Row key={p.id}>
+             
               <Table.Cell>
+                {editingUSerID === p.id? <Spinner/> :
                 <Editable.Root
                   defaultValue={p.name}
+                  disabled={isLoadingState}
                   onValueCommit={(val) => {
                     updateParticipant(p.id, "name", val.value);
                   }}
@@ -349,7 +361,7 @@ const TablicaUczestnikow = () => {
                       </IconButton>
                     </Editable.SubmitTrigger>
                   </Editable.Control>
-                </Editable.Root>
+                </Editable.Root> }
               </Table.Cell>
               <Table.Cell>
                 <HStack>
@@ -380,6 +392,7 @@ const TablicaUczestnikow = () => {
                 </HStack>
               </Table.Cell>
               <Table.Cell textAlign="right">
+              {!isLoadingState && 
                 <Dialog.Root role="alertdialog">
                   <Dialog.Trigger asChild>
                     <Button
@@ -429,7 +442,7 @@ const TablicaUczestnikow = () => {
                       </Dialog.Content>
                     </Dialog.Positioner>
                   </Portal>
-                </Dialog.Root>
+                </Dialog.Root>}
               </Table.Cell>
             </Table.Row>
           ))}
