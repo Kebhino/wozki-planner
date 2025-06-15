@@ -24,7 +24,6 @@ import {
   Table,
   useBreakpointValue,
   Text,
-  Spinner,
 } from "@chakra-ui/react";
 import type { ToastPosition } from "@chakra-ui/toast";
 import { createStandaloneToast } from "@chakra-ui/toast";
@@ -47,6 +46,7 @@ const TablicaUczestnikow = () => {
     type: "surname",
     direction: "asc",
   });
+  const [editingUSerID, setEditingUserid] = useState<string[]>([]);
 
   const position = useBreakpointValue({
     base: "top",
@@ -59,8 +59,6 @@ const TablicaUczestnikow = () => {
       active: true,
     }
   );
-  const [isLoadingState, setisLoading] = useState(false)
-  const [editingUSerID, setEditingUserid] = useState('')
 
   const {
     data: participants = [],
@@ -176,11 +174,12 @@ const TablicaUczestnikow = () => {
     field: keyof Participant,
     value: string | boolean
   ) => {
-    setisLoading(true)
-    setEditingUserid(id)
+    setEditingUserid((prevId) =>
+      prevId.includes(id) ? prevId : [...prevId, id]
+    );
     try {
       await updateParticipantInDb(id, field, value);
-      queryClient.invalidateQueries({ queryKey: ["participants"] });
+      await queryClient.invalidateQueries({ queryKey: ["participants"] });
     } catch (error) {
       toast({
         title: "Błąd aktualizacji",
@@ -190,9 +189,9 @@ const TablicaUczestnikow = () => {
         isClosable: true,
         variant: "subtle",
       });
+    } finally {
+      setEditingUserid((prevId) => prevId.filter((idFilter) => idFilter != id));
     }
-    setisLoading(false)
-    setEditingUserid('')
   };
 
   const deleteParticipant = async (id: string) => {
@@ -221,8 +220,6 @@ const TablicaUczestnikow = () => {
   return (
     <Box pt={4}>
       <ToastContainer />
-      
-
 
       {/* Formularz */}
       <HStack gap={2}>
@@ -286,7 +283,7 @@ const TablicaUczestnikow = () => {
       </HStack>
 
       {/* Tabela */}
-      <Table.Root width="100%" mt={3} color={"black"} interactive pointerEvents={isLoadingState ? "none" : "auto"}>
+      <Table.Root width="100%" mt={3} color={"black"} interactive>
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeader fontWeight={"bold"}>
@@ -314,12 +311,11 @@ const TablicaUczestnikow = () => {
         <Table.Body>
           {sortedParticipants.map((p) => (
             <Table.Row key={p.id}>
-             
               <Table.Cell>
-                {editingUSerID === p.id? <Spinner/> :
                 <Editable.Root
                   defaultValue={p.name}
-                  disabled={isLoadingState}
+                  disabled={editingUSerID.includes(p.id)}
+                  opacity={editingUSerID.includes(p.id) ? 0.4 : 1}
                   onValueCommit={(val) => {
                     updateParticipant(p.id, "name", val.value);
                   }}
@@ -361,7 +357,7 @@ const TablicaUczestnikow = () => {
                       </IconButton>
                     </Editable.SubmitTrigger>
                   </Editable.Control>
-                </Editable.Root> }
+                </Editable.Root>
               </Table.Cell>
               <Table.Cell>
                 <HStack>
@@ -377,8 +373,13 @@ const TablicaUczestnikow = () => {
                       </option>
                     ))}
                   </StyledSelect>
-                  {editingUSerID === p.id? <Spinner/> :
-                  <Switch.Root ml={5} colorPalette={"green"} checked={p.active}>
+
+                  <Switch.Root
+                    ml={5}
+                    colorPalette={"green"}
+                    checked={p.active}
+                    disabled={editingUSerID.includes(p.id)}
+                  >
                     <Switch.HiddenInput
                       onChange={(e) => {
                         const newValue = e.target.checked;
@@ -389,17 +390,17 @@ const TablicaUczestnikow = () => {
                       <Switch.Thumb />
                     </Switch.Control>
                     <Switch.Label />
-                  </Switch.Root>}
+                  </Switch.Root>
                 </HStack>
               </Table.Cell>
               <Table.Cell textAlign="right">
-              {editingUSerID === p.id? <Spinner/> :
                 <Dialog.Root role="alertdialog">
                   <Dialog.Trigger asChild>
                     <Button
                       size="sm"
                       mr={2}
                       borderRadius={5}
+                      disabled={editingUSerID.includes(p.id)}
                       bg={"red.600"}
                       _hover={{ bg: "red", color: "white" }}
                       transition="all 0.2s"
@@ -443,7 +444,7 @@ const TablicaUczestnikow = () => {
                       </Dialog.Content>
                     </Dialog.Positioner>
                   </Portal>
-                </Dialog.Root>}
+                </Dialog.Root>
               </Table.Cell>
             </Table.Row>
           ))}
