@@ -47,7 +47,6 @@ const TablicaUczestnikow = () => {
     type: "surname",
     direction: "asc",
   });
-  const [editingUSerID, setEditingUserid] = useState<string[]>([]);
 
   const [mapaEdytowanychPol, setMapeEdytowanychPol] = useState<
     Map<string, string[]>
@@ -214,9 +213,6 @@ const TablicaUczestnikow = () => {
     field: keyof Participant,
     value: string | boolean
   ) => {
-    setEditingUserid((prevId) =>
-      prevId.includes(id) ? prevId : [...prevId, id]
-    );
     try {
       await updateParticipantInDb(id, field, value);
       await queryClient.invalidateQueries({ queryKey: ["participants"] });
@@ -229,8 +225,6 @@ const TablicaUczestnikow = () => {
         isClosable: true,
         variant: "subtle",
       });
-    } finally {
-      setEditingUserid((prevId) => prevId.filter((idFilter) => idFilter != id));
     }
   };
 
@@ -360,7 +354,7 @@ const TablicaUczestnikow = () => {
                     onValueCommit={(val) => {
                       dodajPoleDoMapy(p.id, "name");
 
-                      updateParticipantInDb(p.id, "name", val.value)
+                      updateParticipant(p.id, "name", val.value)
                         .then(() => toast({ title: "Zmieniono imię" }))
                         .finally(() => usunPoleZMapy(p.id, "name"));
                     }}
@@ -421,7 +415,7 @@ const TablicaUczestnikow = () => {
                             toast({
                               description: (
                                 <Text>
-                                  Zmieniono status uczestnika {p.name}:{" "}
+                                  Zmieniono status uczestnika {p.name} na:{" "}
                                   <Text
                                     as="span"
                                     fontWeight="bold"
@@ -488,7 +482,11 @@ const TablicaUczestnikow = () => {
                         size="md"
                         mr={2}
                         borderRadius={5}
-                        disabled={editingUSerID.includes(p.id)}
+                        disabled={
+                          czyPoleJestZapisywane(p.id, "name") ||
+                          czyPoleJestZapisywane(p.id, "active") ||
+                          czyPoleJestZapisywane(p.id, "status")
+                        }
                         color={"red.600"}
                         bg={"white"}
                         _hover={{ bg: "red", color: "white" }}
