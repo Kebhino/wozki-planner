@@ -63,28 +63,32 @@ const TablicaUczestnikow = () => {
   };
 
   const dodajPoleDoMapy = (id: string, nazwaPola: string) => {
-    const nowaMapa = new Map(mapaEdytowanychPol);
+    setMapeEdytowanychPol((prev) => {
+      const nowaMapa = new Map(prev);
 
-    const aktualnePola = nowaMapa.get(id) || [];
+      const aktualnePola = nowaMapa.get(id) || [];
 
-    if (!aktualnePola.includes(nazwaPola))
-      nowaMapa.set(id, [...aktualnePola, nazwaPola]);
+      if (!aktualnePola.includes(nazwaPola))
+        nowaMapa.set(id, [...aktualnePola, nazwaPola]);
 
-    setMapeEdytowanychPol(nowaMapa);
+      return nowaMapa;
+    });
   };
 
   const usunPoleZMapy = (id: string, nazwaPola: string) => {
-    const nowaMapa = new Map(mapaEdytowanychPol);
+    setMapeEdytowanychPol((prev) => {
+      const nowaMapa = new Map(prev);
 
-    const zaktualizowanaListaPol = (nowaMapa.get(id) || []).filter(
-      (pole) => pole !== nazwaPola
-    );
+      const zaktualizowanaListaPol = (nowaMapa.get(id) || []).filter(
+        (pole) => pole !== nazwaPola
+      );
 
-    if (zaktualizowanaListaPol.length > 0) {
-      nowaMapa.set(id, zaktualizowanaListaPol);
-    } else nowaMapa.delete(id);
+      if (zaktualizowanaListaPol.length > 0) {
+        nowaMapa.set(id, zaktualizowanaListaPol);
+      } else nowaMapa.delete(id);
 
-    setMapeEdytowanychPol(nowaMapa);
+      return nowaMapa;
+    });
   };
 
   const position = useBreakpointValue({
@@ -407,8 +411,6 @@ const TablicaUczestnikow = () => {
                       defaultValue={p.status}
                       disabled={czyPoleJestZapisywane(p.id, "status")}
                       onChange={(e) => {
-                        console.log(e.target.value);
-
                         dodajPoleDoMapy(p.id, "status");
                         updateParticipant(p.id, "status", e.target.value)
                           .then(() =>
