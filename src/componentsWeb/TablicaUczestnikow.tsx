@@ -49,6 +49,45 @@ const TablicaUczestnikow = () => {
   });
   const [editingUSerID, setEditingUserid] = useState<string[]>([]);
 
+  const [mapaEdytowanychPol, setMapeEdytowanychPol] = useState<
+    Map<string, string[]>
+  >(new Map());
+
+  const czyPoleJestZapisywane = (id: string, nazwaPola: string) => {
+    const zapisywanePola = mapaEdytowanychPol.get(id);
+
+    if (!zapisywanePola) return false;
+
+    const czyZawieraPole = zapisywanePola.includes(nazwaPola);
+
+    return czyZawieraPole; // da mi true albo false
+  };
+
+  const dodajPoleDoMapy = (id: string, nazwaPola: string) => {
+    const nowaMapa = new Map(mapaEdytowanychPol);
+
+    const aktualnePola = nowaMapa.get(id) || [];
+
+    if (!aktualnePola.includes(nazwaPola))
+      nowaMapa.set(id, [...aktualnePola, nazwaPola]);
+
+    setMapeEdytowanychPol(nowaMapa);
+  };
+
+  const usunPoleZMapy = (id: string, nazwaPola: string) => {
+    const nowaMapa = new Map(mapaEdytowanychPol);
+
+    const zaktualizowanaListaPol = (nowaMapa.get(id) || []).filter(
+      (pole) => pole !== nazwaPola
+    );
+
+    if (zaktualizowanaListaPol.length > 0) {
+      nowaMapa.set(id, zaktualizowanaListaPol);
+    } else nowaMapa.delete(id);
+
+    setMapeEdytowanychPol(nowaMapa);
+  };
+
   const position = useBreakpointValue({
     base: "top",
     lg: "bottom",
@@ -313,86 +352,128 @@ const TablicaUczestnikow = () => {
           {sortedParticipants.map((p) => (
             <Table.Row key={p.id}>
               <Table.Cell>
-                <Editable.Root
-                  defaultValue={p.name}
-                  disabled={editingUSerID.includes(p.id)}
-                  opacity={editingUSerID.includes(p.id) ? 0.4 : 1}
-                  onValueCommit={(val) => {
-                    updateParticipant(p.id, "name", val.value);
-                  }}
-                  submitMode="enter"
-                >
-                  <Editable.Preview />
-                  <Editable.Input />
-                  <Editable.Control>
-                    <Editable.EditTrigger asChild>
-                      <IconButton
-                        variant="ghost"
-                        size="xs"
-                        borderRadius={"full"}
-                        _hover={{
-                          bg: "green.500",
-                        }}
-                      >
-                        <LuPencilLine />
-                      </IconButton>
-                    </Editable.EditTrigger>
-                    <Editable.CancelTrigger asChild>
-                      <IconButton
-                        variant="outline"
-                        size="xs"
-                        color={"red.600"}
-                        borderRadius={10}
-                      >
-                        <LuX />
-                      </IconButton>
-                    </Editable.CancelTrigger>
-                    <Editable.SubmitTrigger asChild>
-                      <IconButton
-                        variant="outline"
-                        size="xs"
-                        color={"green.500"}
-                        borderRadius={10}
-                      >
-                        <LuCheck />
-                      </IconButton>
-                    </Editable.SubmitTrigger>
-                  </Editable.Control>
-                </Editable.Root>
+                {!czyPoleJestZapisywane(p.id, "name") ? (
+                  <Editable.Root
+                    defaultValue={p.name}
+                    disabled={czyPoleJestZapisywane(p.id, "name")}
+                    opacity={czyPoleJestZapisywane(p.id, "name") ? 0.4 : 1}
+                    onValueCommit={(val) => {
+                      dodajPoleDoMapy(p.id, "name");
+
+                      updateParticipantInDb(p.id, "name", val.value)
+                        .then(() => toast({ title: "Zmieniono imię" }))
+                        .finally(() => usunPoleZMapy(p.id, "name"));
+                    }}
+                  >
+                    <Editable.Preview />
+                    <Editable.Input />
+                    <Editable.Control>
+                      <Editable.EditTrigger asChild>
+                        <IconButton
+                          variant="ghost"
+                          size="xs"
+                          borderRadius={"full"}
+                          _hover={{
+                            bg: "green.500",
+                          }}
+                        >
+                          <LuPencilLine />
+                        </IconButton>
+                      </Editable.EditTrigger>
+                      <Editable.CancelTrigger asChild>
+                        <IconButton
+                          variant="outline"
+                          size="xs"
+                          color={"red.600"}
+                          borderRadius={10}
+                        >
+                          <LuX />
+                        </IconButton>
+                      </Editable.CancelTrigger>
+                      <Editable.SubmitTrigger asChild>
+                        <IconButton
+                          variant="outline"
+                          size="xs"
+                          color={"green.500"}
+                          borderRadius={10}
+                        >
+                          <LuCheck />
+                        </IconButton>
+                      </Editable.SubmitTrigger>
+                    </Editable.Control>
+                  </Editable.Root>
+                ) : (
+                  <Spinner />
+                )}
               </Table.Cell>
               <Table.Cell>
                 <HStack>
-                  <StyledSelect
-                    defaultValue={p.status}
-                    disabled={editingUSerID.includes(p.id)}
-                    onChange={(e) =>
-                      updateParticipant(p.id, "status", e.target.value)
-                    }
-                  >
-                    {statusOptions.map((status) => (
-                      <option key={status} value={status}>
-                        {status}
-                      </option>
-                    ))}
-                  </StyledSelect>
-
-                  <Switch.Root
-                    ml={5}
-                    colorPalette={"green"}
-                    checked={p.active}
-                    disabled={editingUSerID.includes(p.id)}
-                  >
-                    <Switch.HiddenInput
+                  {!czyPoleJestZapisywane(p.id, "status") ? (
+                    <StyledSelect
+                      defaultValue={p.status}
+                      disabled={czyPoleJestZapisywane(p.id, "status")}
                       onChange={(e) => {
-                        const newValue = e.target.checked;
-                        updateParticipant(p.id, "active", newValue);
+                        console.log(e.target.value);
+
+                        dodajPoleDoMapy(p.id, "status");
+                        updateParticipant(p.id, "status", e.target.value)
+                          .then(() =>
+                            toast({
+                              description: (
+                                <Text>
+                                  Zmieniono status uczestnika {p.name}:{" "}
+                                  <Text
+                                    as="span"
+                                    fontWeight="bold"
+                                    display="inline"
+                                  >
+                                    {e.target.value}
+                                  </Text>
+                                </Text>
+                              ),
+                            })
+                          )
+                          .finally(() => usunPoleZMapy(p.id, "status"));
                       }}
-                    />
-                    <Switch.Control>
-                      <Switch.Thumb />
-                    </Switch.Control>
-                    <Switch.Label />
-                  </Switch.Root>
+                    >
+                      {statusOptions.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </StyledSelect>
+                  ) : (
+                    <Spinner ml={5} />
+                  )}
+                  {!czyPoleJestZapisywane(p.id, "active") ? (
+                    <Switch.Root
+                      ml={5}
+                      colorPalette={"green"}
+                      checked={p.active}
+                      disabled={czyPoleJestZapisywane(p.id, "active")}
+                    >
+                      <Switch.HiddenInput
+                        onChange={(e) => {
+                          dodajPoleDoMapy(p.id, "active");
+                          updateParticipant(p.id, "active", e.target.checked)
+                            .then(() =>
+                              toast({
+                                title: e.target.checked
+                                  ? "Uczestnik aktywny"
+                                  : "Uczestnik nieaktywny",
+                              })
+                            )
+                            .finally(() => usunPoleZMapy(p.id, "active"));
+                        }}
+                      />
+                      <Switch.Control>
+                        <Switch.Thumb />
+                      </Switch.Control>
+                      <Switch.Label />
+                    </Switch.Root>
+                  ) : (
+                    <Spinner ml={7} />
+                  )}
                 </HStack>
               </Table.Cell>
               <Table.Cell
@@ -400,14 +481,11 @@ const TablicaUczestnikow = () => {
                 alignItems="center"
                 justifyContent="flex-end"
               >
-                {editingUSerID.includes(p.id) && (
-                  <Spinner boxSize={5} mr={5} alignItems={"center"} />
-                )}
-                {!editingUSerID.includes(p.id) && (
-                  <Dialog.Root role="alertdialog">
-                    <Dialog.Trigger asChild>
+                <Dialog.Root role="alertdialog">
+                  <Dialog.Trigger asChild>
+                    {!czyPoleJestZapisywane(p.id, "usun") ? (
                       <Button
-                        size="sm"
+                        size="md"
                         mr={2}
                         borderRadius={5}
                         disabled={editingUSerID.includes(p.id)}
@@ -416,51 +494,59 @@ const TablicaUczestnikow = () => {
                         _hover={{ bg: "red", color: "white" }}
                         transition="all 0.2s"
                         _active={{ transform: "scale(0.95)", bg: "red.600" }}
+                        onClick={() => dodajPoleDoMapy(p.id, "usun")}
                       >
                         <MdOutlineDeleteForever />
                       </Button>
-                    </Dialog.Trigger>
-                    <Portal>
-                      <Dialog.Backdrop />
-                      <Dialog.Positioner>
-                        <Dialog.Content>
-                          <Dialog.Header>
-                            <Dialog.Title>Jesteś pewien?</Dialog.Title>
-                          </Dialog.Header>
-                          <Dialog.Body>
-                            Czy jesteś pewien, że chcesz usunąć uczestnika:{" "}
-                            <Text
-                              fontWeight={"bold"}
-                              textAlign={"center"}
-                              mt={5}
-                            >
-                              {p.name}
+                    ) : (
+                      <Spinner mr={6} size={"md"} />
+                    )}
+                  </Dialog.Trigger>
+                  <Portal>
+                    <Dialog.Backdrop />
+                    <Dialog.Positioner>
+                      <Dialog.Content>
+                        <Dialog.Header>
+                          <Dialog.Title>Jesteś pewien?</Dialog.Title>
+                        </Dialog.Header>
+                        <Dialog.Body>
+                          Czy jesteś pewien, że chcesz usunąć uczestnika:{" "}
+                          <Text fontWeight={"bold"} textAlign={"center"} mt={5}>
+                            {p.name}
+                          </Text>
+                          {p.active && (
+                            <Text textAlign="center" color="red" pt={5}>
+                              <b>{p.name}</b> jest oznaczony jako aktywny
                             </Text>
-                            {p.active && (
-                              <Text textAlign={"center"} color={"red"} pt={5}>
-                                <b>{p.name}</b> jest oznaczony jako aktywny
-                              </Text>
-                            )}
-                          </Dialog.Body>
-                          <Dialog.Footer>
-                            <Dialog.ActionTrigger asChild>
-                              <Button variant="outline">Nie</Button>
-                            </Dialog.ActionTrigger>
+                          )}
+                        </Dialog.Body>
+                        <Dialog.Footer>
+                          <Dialog.ActionTrigger asChild>
                             <Button
-                              colorPalette="red"
-                              onClick={() => deleteParticipant(p.id)}
+                              variant="outline"
+                              onClick={() => usunPoleZMapy(p.id, "usun")}
                             >
-                              Tak
+                              Nie
                             </Button>
-                          </Dialog.Footer>
-                          <Dialog.CloseTrigger asChild>
-                            <CloseButton size="sm" />
-                          </Dialog.CloseTrigger>
-                        </Dialog.Content>
-                      </Dialog.Positioner>
-                    </Portal>
-                  </Dialog.Root>
-                )}
+                          </Dialog.ActionTrigger>
+                          <Button
+                            colorPalette="red"
+                            onClick={() => {
+                              deleteParticipant(p.id).finally(() =>
+                                usunPoleZMapy(p.id, "usun")
+                              );
+                            }}
+                          >
+                            Tak
+                          </Button>
+                        </Dialog.Footer>
+                        <Dialog.CloseTrigger asChild>
+                          <CloseButton size="sm" />
+                        </Dialog.CloseTrigger>
+                      </Dialog.Content>
+                    </Dialog.Positioner>
+                  </Portal>
+                </Dialog.Root>
               </Table.Cell>
             </Table.Row>
           ))}
