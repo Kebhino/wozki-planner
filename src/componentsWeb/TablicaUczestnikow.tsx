@@ -43,6 +43,7 @@ const statusOptions: Status[] = ["Pionier St.", "Pionier Pom.", "Głosiciel"];
 
 const TablicaUczestnikow = () => {
   const queryClient = useQueryClient();
+  const [uzytkownikDodawany, setUzytkownikDodawany] = useState(false);
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     type: "surname",
     direction: "asc",
@@ -186,10 +187,12 @@ const TablicaUczestnikow = () => {
     };
 
     try {
+      setUzytkownikDodawany(true);
       await addParticipant(payload); // 👈 WYWOŁANIE z api/participants.ts
 
       queryClient.invalidateQueries({ queryKey: ["participants"] });
       setNewParticipant({ name: "", status: "Głosiciel", active: true });
+      setUzytkownikDodawany(false);
 
       toast({
         title: "Dodano uczestnika",
@@ -307,6 +310,7 @@ const TablicaUczestnikow = () => {
 
         <Button
           colorScheme="green"
+          disabled={uzytkownikDodawany}
           onClick={handleAddParticipant}
           bg="white"
           color="black"
@@ -316,7 +320,7 @@ const TablicaUczestnikow = () => {
           borderRadius={10}
           _hover={{ bg: "green.400", color: "white" }}
         >
-          <IoMdAdd />
+          {uzytkownikDodawany ? <Spinner /> : <IoMdAdd />}
         </Button>
       </HStack>
 
