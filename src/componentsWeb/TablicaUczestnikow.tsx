@@ -539,7 +539,7 @@ const TablicaUczestnikow = () => {
                               onClick={() => {
                                 console.log(p.id);
 
-                                usunPoleZMapy(idDoUsuniecia, "usun");
+                                usunPoleZMapy(p.id, "usun");
                               }}
                             >
                               Nie
