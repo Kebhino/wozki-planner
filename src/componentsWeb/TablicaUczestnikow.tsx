@@ -547,6 +547,7 @@ const TablicaUczestnikow = () => {
                           <Button
                             colorPalette="red"
                             onClick={() => {
+                              setIdDoUsuniecia("");
                               deleteParticipant(p.id).finally(() =>
                                 usunPoleZMapy(p.id, "usun")
                               );
