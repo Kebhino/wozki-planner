@@ -556,7 +556,13 @@ const TablicaUczestnikow = () => {
                           </Button>
                         </Dialog.Footer>
                         <Dialog.CloseTrigger asChild>
-                          <CloseButton size="sm" />
+                          <CloseButton
+                            size="md"
+                            onClick={() => {
+                              resetIdDoUsuniecia();
+                              usunPoleZMapy(p.id, "usun");
+                            }}
+                          />
                         </Dialog.CloseTrigger>
                       </Dialog.Content>
                     </Dialog.Positioner>
