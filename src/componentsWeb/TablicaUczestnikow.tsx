@@ -36,6 +36,7 @@ import { MdOutlineDeleteForever } from "react-icons/md";
 import { IoMdAdd } from "react-icons/io";
 import { v4 as uuidv4 } from "uuid";
 import SortableColumnHeader from "./SortowanieWKolumnie";
+import { useGlobalDialogStore } from "./stores/useGlobalDialogStore";
 const StyledSelect = chakra("select");
 const { ToastContainer, toast } = createStandaloneToast();
 
@@ -44,8 +45,9 @@ const statusOptions: Status[] = ["Pionier St.", "Pionier Pom.", "Głosiciel"];
 const TablicaUczestnikow = () => {
   const queryClient = useQueryClient();
   const [uzytkownikDodawany, setUzytkownikDodawany] = useState(false);
+  const { setIdDoUsuniecia, idDoUsuniecia, resetIdDoUsuniecia } =
+    useGlobalDialogStore();
 
-  const [idDoUsuniecia, setIdDoUsuniecia] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     type: "surname",
     direction: "asc",
@@ -416,7 +418,6 @@ const TablicaUczestnikow = () => {
                   {!czyPoleJestZapisywane(p.id, "status") ? (
                     <StyledSelect
                       defaultValue={p.status}
-                      disabled={czyPoleJestZapisywane(p.id, "status")}
                       onChange={(e) => {
                         dodajPoleDoMapy(p.id, "status");
                         updateParticipant(p.id, "status", e.target.value)
@@ -453,7 +454,6 @@ const TablicaUczestnikow = () => {
                       ml={5}
                       colorPalette={"green"}
                       checked={p.active}
-                      disabled={czyPoleJestZapisywane(p.id, "active")}
                     >
                       <Switch.HiddenInput
                         onChange={(e) => {
@@ -535,7 +535,7 @@ const TablicaUczestnikow = () => {
                             <Button
                               variant="outline"
                               onClick={() => {
-                                setIdDoUsuniecia("");
+                                resetIdDoUsuniecia();
                                 usunPoleZMapy(p.id, "usun");
                               }}
                             >
@@ -545,7 +545,7 @@ const TablicaUczestnikow = () => {
                           <Button
                             colorPalette="red"
                             onClick={() => {
-                              setIdDoUsuniecia("");
+                              resetIdDoUsuniecia();
                               deleteParticipant(p.id).finally(() =>
                                 usunPoleZMapy(p.id, "usun")
                               );
