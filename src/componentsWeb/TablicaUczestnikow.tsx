@@ -363,6 +363,7 @@ const TablicaUczestnikow = () => {
                 {!czyPoleJestZapisywane(p.id, "name") ? (
                   <Editable.Root
                     defaultValue={p.name}
+                    submitMode={"enter"}
                     disabled={czyPoleJestZapisywane(p.id, "name")}
                     opacity={czyPoleJestZapisywane(p.id, "name") ? 0.4 : 1}
                     onValueCommit={(val) => {
