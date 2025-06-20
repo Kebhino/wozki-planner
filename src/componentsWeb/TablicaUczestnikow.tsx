@@ -25,6 +25,7 @@ import {
   useBreakpointValue,
   Text,
   Spinner,
+  Stack,
 } from "@chakra-ui/react";
 import type { ToastPosition } from "@chakra-ui/toast";
 import { createStandaloneToast } from "@chakra-ui/toast";
@@ -373,41 +374,43 @@ const TablicaUczestnikow = () => {
                     }}
                   >
                     <Editable.Preview />
-                    <Editable.Input />
-                    <Editable.Control>
-                      <Editable.EditTrigger asChild>
-                        <IconButton
-                          variant="ghost"
-                          size="xs"
-                          borderRadius={"full"}
-                          _hover={{
-                            bg: "green.500",
-                          }}
-                        >
-                          <LuPencilLine />
-                        </IconButton>
-                      </Editable.EditTrigger>
-                      <Editable.CancelTrigger asChild>
-                        <IconButton
-                          variant="outline"
-                          size="xs"
-                          color={"red.600"}
-                          borderRadius={10}
-                        >
-                          <LuX />
-                        </IconButton>
-                      </Editable.CancelTrigger>
-                      <Editable.SubmitTrigger asChild>
-                        <IconButton
-                          variant="outline"
-                          size="xs"
-                          color={"green.500"}
-                          borderRadius={10}
-                        >
-                          <LuCheck />
-                        </IconButton>
-                      </Editable.SubmitTrigger>
-                    </Editable.Control>
+                    <Stack direction={{ base: "column", md: "row" }}>
+                      <Editable.Input />
+                      <Editable.Control>
+                        <Editable.EditTrigger asChild>
+                          <IconButton
+                            variant="ghost"
+                            size="xs"
+                            borderRadius={"full"}
+                            _hover={{
+                              bg: "green.500",
+                            }}
+                          >
+                            <LuPencilLine />
+                          </IconButton>
+                        </Editable.EditTrigger>
+                        <Editable.CancelTrigger asChild>
+                          <IconButton
+                            variant="outline"
+                            size={{ base: "2xs", md: "sm", lg: "sm" }}
+                            color={"red.600"}
+                            borderRadius={10}
+                          >
+                            <LuX />
+                          </IconButton>
+                        </Editable.CancelTrigger>
+                        <Editable.SubmitTrigger asChild>
+                          <IconButton
+                            variant="outline"
+                            size={{ base: "2xs", md: "sm", lg: "sm" }}
+                            color={"green.500"}
+                            borderRadius={10}
+                          >
+                            <LuCheck />
+                          </IconButton>
+                        </Editable.SubmitTrigger>
+                      </Editable.Control>
+                    </Stack>
                   </Editable.Root>
                 ) : (
                   <Spinner />
@@ -418,6 +421,7 @@ const TablicaUczestnikow = () => {
                   {!czyPoleJestZapisywane(p.id, "status") ? (
                     <StyledSelect
                       defaultValue={p.status}
+                      fontSize={{ base: "xs", md: "sm", lg: "sm" }}
                       onChange={(e) => {
                         dodajPoleDoMapy(p.id, "status");
                         updateParticipant(p.id, "status", e.target.value)
@@ -454,6 +458,7 @@ const TablicaUczestnikow = () => {
                       ml={5}
                       colorPalette={"green"}
                       checked={p.active}
+                      size={{ base: "xs", md: "sm", lg: "md" }}
                     >
                       <Switch.HiddenInput
                         onChange={(e) => {
