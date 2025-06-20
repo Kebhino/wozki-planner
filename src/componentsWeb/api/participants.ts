@@ -11,8 +11,8 @@ export const addParticipant = async (payload: AddParticipantProps) => {
   return res;
 };
 
-export const getParticipants = async () => {
-  const res = await fetch("https://gngp5xd4ol.execute-api.eu-central-1.amazonaws.com/participants");
+export const getParticipants = async (signal?: AbortSignal) => {
+  const res = await fetch("https://gngp5xd4ol.execute-api.eu-central-1.amazonaws.com/participants", {signal});
   if (!res.ok) throw new Error("Błąd pobierania uczestników");
   const data = await res.json();
   return data.items;
