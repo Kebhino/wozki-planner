@@ -44,7 +44,7 @@ const statusOptions: Status[] = ["Pionier St.", "Pionier Pom.", "Głosiciel"];
 const TablicaUczestnikow = () => {
   const queryClient = useQueryClient();
   const [uzytkownikDodawany, setUzytkownikDodawany] = useState(false);
-  const [czyDialogJestOtwarty, setCzyDialogJestOtwarty] = useState(false);
+
   const [idDoUsuniecia, setIdDoUsuniecia] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     type: "surname",
@@ -80,7 +80,6 @@ const TablicaUczestnikow = () => {
 
   const usunPoleZMapy = (id: string, nazwaPola: string) => {
     setMapeEdytowanychPol((prev) => {
-      setCzyDialogJestOtwarty(false);
       const nowaMapa = new Map(prev);
 
       const zaktualizowanaListaPol = (nowaMapa.get(id) || []).filter(
@@ -505,7 +504,6 @@ const TablicaUczestnikow = () => {
                         onClick={() => {
                           dodajPoleDoMapy(p.id, "usun");
                           setIdDoUsuniecia(p.id);
-                          setCzyDialogJestOtwarty(true);
                         }}
                       >
                         <MdOutlineDeleteForever />
@@ -536,7 +534,7 @@ const TablicaUczestnikow = () => {
                           <Dialog.ActionTrigger asChild>
                             <Button
                               variant="outline"
-                              onClick={(e) => {
+                              onClick={() => {
                                 setIdDoUsuniecia("");
                                 usunPoleZMapy(p.id, "usun");
                               }}
