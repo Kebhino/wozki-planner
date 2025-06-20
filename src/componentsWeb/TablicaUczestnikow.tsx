@@ -44,6 +44,8 @@ const statusOptions: Status[] = ["Pionier St.", "Pionier Pom.", "Głosiciel"];
 const TablicaUczestnikow = () => {
   const queryClient = useQueryClient();
   const [uzytkownikDodawany, setUzytkownikDodawany] = useState(false);
+  const [czyDialogJestOtwarty, setCzyDialogJestOtwarty] = useState(false);
+  const [idDoUsuniecia, setIdDoUsuniecia] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     type: "surname",
     direction: "asc",
@@ -78,6 +80,7 @@ const TablicaUczestnikow = () => {
 
   const usunPoleZMapy = (id: string, nazwaPola: string) => {
     setMapeEdytowanychPol((prev) => {
+      setCzyDialogJestOtwarty(false);
       const nowaMapa = new Map(prev);
 
       const zaktualizowanaListaPol = (nowaMapa.get(id) || []).filter(
@@ -87,6 +90,7 @@ const TablicaUczestnikow = () => {
       if (zaktualizowanaListaPol.length > 0) {
         nowaMapa.set(id, zaktualizowanaListaPol);
       } else nowaMapa.delete(id);
+      console.log(nowaMapa);
 
       return nowaMapa;
     });
@@ -481,7 +485,7 @@ const TablicaUczestnikow = () => {
                 alignItems="center"
                 justifyContent="flex-end"
               >
-                <Dialog.Root role="alertdialog">
+                <Dialog.Root role="alertdialog" open={czyDialogJestOtwarty}>
                   <Dialog.Trigger asChild>
                     {!czyPoleJestZapisywane(p.id, "usun") ? (
                       <Button
@@ -498,7 +502,11 @@ const TablicaUczestnikow = () => {
                         _hover={{ bg: "red", color: "white" }}
                         transition="all 0.2s"
                         _active={{ transform: "scale(0.95)", bg: "red.600" }}
-                        onClick={() => dodajPoleDoMapy(p.id, "usun")}
+                        onClick={() => {
+                          dodajPoleDoMapy(p.id, "usun");
+                          setIdDoUsuniecia(p.id);
+                          setCzyDialogJestOtwarty(true);
+                        }}
                       >
                         <MdOutlineDeleteForever />
                       </Button>
@@ -528,7 +536,11 @@ const TablicaUczestnikow = () => {
                           <Dialog.ActionTrigger asChild>
                             <Button
                               variant="outline"
-                              onClick={() => usunPoleZMapy(p.id, "usun")}
+                              onClick={() => {
+                                console.log(p.id);
+
+                                usunPoleZMapy(idDoUsuniecia, "usun");
+                              }}
                             >
                               Nie
                             </Button>
