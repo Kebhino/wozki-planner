@@ -485,7 +485,7 @@ const TablicaUczestnikow = () => {
                 alignItems="center"
                 justifyContent="flex-end"
               >
-                <Dialog.Root role="alertdialog" open={czyDialogJestOtwarty}>
+                <Dialog.Root role="alertdialog" open={idDoUsuniecia === p.id}>
                   <Dialog.Trigger asChild>
                     {!czyPoleJestZapisywane(p.id, "usun") ? (
                       <Button
@@ -536,9 +536,8 @@ const TablicaUczestnikow = () => {
                           <Dialog.ActionTrigger asChild>
                             <Button
                               variant="outline"
-                              onClick={() => {
-                                console.log(p.id);
-
+                              onClick={(e) => {
+                                setIdDoUsuniecia("");
                                 usunPoleZMapy(p.id, "usun");
                               }}
                             >
