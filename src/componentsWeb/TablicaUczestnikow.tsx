@@ -484,11 +484,7 @@ const TablicaUczestnikow = () => {
                   )}
                 </HStack>
               </Table.Cell>
-              <Table.Cell
-                display="flex"
-                alignItems="center"
-                justifyContent="flex-end"
-              >
+              <Table.Cell>
                 <Dialog.Root role="alertdialog" open={idDoUsuniecia === p.id}>
                   <Dialog.Trigger asChild>
                     {!czyPoleJestZapisywane(p.id, "usun") ? (
