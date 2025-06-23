@@ -7,13 +7,13 @@ export const addLocalization = async (payload: AddLocationProps) => {
     body: JSON.stringify(payload),
   });
 
-  if (!res.ok) throw new Error("Nie udało się dodać uczestnika");
+  if (!res.ok) throw new Error("Nie udało się dodać lokalizacji");
   return res;
 };
 
 export const getLocalizations = async (signal?: AbortSignal) => {
   const res = await fetch("https://gngp5xd4ol.execute-api.eu-central-1.amazonaws.com/lokalizacje", {signal});
-  if (!res.ok) throw new Error("Błąd pobierania uczestników");
+  if (!res.ok) throw new Error("Błąd pobierania lokalizacji");
   const data = await res.json();
   return data.items;
 };
@@ -31,7 +31,7 @@ export const updateLocalizationInDb = async (
       body: JSON.stringify({ [field]: value }),
     }
   );
-  if (!res.ok) throw new Error("Nie udało się zaktualizować uczestnika");
+  if (!res.ok) throw new Error("Nie udało się zaktualizować lokalizacji");
 };
 
 export const deleteLocalizationFromDb = async (id: string) => {
@@ -42,6 +42,6 @@ export const deleteLocalizationFromDb = async (id: string) => {
     }
   );
   if (!res.ok) {
-    throw new Error("Nie udało się usunąć uczestnika");
+    throw new Error("Nie udało się usunąć lokalizacji");
   }
 };

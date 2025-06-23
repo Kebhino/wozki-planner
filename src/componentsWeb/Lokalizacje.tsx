@@ -128,19 +128,9 @@ const Lokalizacje = () => {
   const sortedParticipants = [...lokalizacje].sort((a, b) => {
     const { type, direction } = sortConfig;
 
-    const valA =
-      type === "surname"
-        ? a.name.split(" ").slice(-1)[0].toLowerCase()
-        : a.active
-        ? 1
-        : 0;
+    const valA = type === "surname" ? a.name.toLowerCase() : a.active ? 1 : 0;
 
-    const valB =
-      type === "surname"
-        ? b.name.split(" ").slice(-1)[0].toLowerCase()
-        : b.active
-        ? 1
-        : 0;
+    const valB = type === "surname" ? b.name.toLowerCase() : b.active ? 1 : 0;
 
     return direction === "asc"
       ? valA > valB
@@ -176,7 +166,7 @@ const Lokalizacje = () => {
   const handleAddLocalization = async () => {
     if (typeof newLocation.name !== "string" || !newLocation.name.trim()) {
       toast({
-        title: "Podaj imię i nazwisko",
+        title: "Podaj nazwe lokalizacji",
         status: "warning",
         duration: 3000,
         position,
@@ -244,7 +234,7 @@ const Lokalizacje = () => {
   const deleteLocalization = async (id: string) => {
     try {
       await deleteLocalizationFromDb(id);
-      await queryClient.invalidateQueries({ queryKey: ["lokalziacje"] });
+
       toast({
         title: "Lokalizacja usunięta",
         status: "info",
@@ -252,6 +242,7 @@ const Lokalizacje = () => {
         position,
         isClosable: true,
       });
+      queryClient.invalidateQueries({ queryKey: ["lokalizacje"] });
     } catch (error) {
       toast({
         title: "Błąd usuwania lokalizacji",
@@ -314,7 +305,7 @@ const Lokalizacje = () => {
           <Table.Row>
             <Table.ColumnHeader fontWeight={"bold"}>
               <SortableColumnHeader
-                label="Imię i nazwisko"
+                label="Lokalizacja"
                 sortKey="surname"
                 currentSort={sortConfig.type}
                 sortAsc={sortConfig.direction === "asc"}
