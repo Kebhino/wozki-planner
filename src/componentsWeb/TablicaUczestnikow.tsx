@@ -185,23 +185,31 @@ const TablicaUczestnikow = () => {
       return;
     }
 
-    const payload: AddParticipantProps = {
-      id: uuidv4(),
-      active: newParticipant.active,
-      name: newParticipant.name,
-      status: newParticipant.status,
-    };
+    const names = newParticipant.name
+      .split(",")
+      .map((name) => name.trim())
+      .filter((name) => name.length > 0);
 
     try {
       setUzytkownikDodawany(true);
-      await addParticipant(payload); // 👈 WYWOŁANIE z api/participants.ts
-
+      for (const name of names) {
+        const payload: AddParticipantProps = {
+          id: uuidv4(),
+          active: newParticipant.active,
+          name: name,
+          status: newParticipant.status,
+        };
+        await addParticipant(payload);
+      }
       queryClient.invalidateQueries({ queryKey: ["participants"] });
       setNewParticipant({ name: "", status: "Głosiciel", active: true });
       setUzytkownikDodawany(false);
 
       toast({
-        title: "Dodano uczestnika",
+        title:
+          names.length > 1
+            ? `Dodano ${names.length} uczestników`
+            : "Dodano uczestnika",
         status: "success",
         duration: 4000,
         isClosable: true,
