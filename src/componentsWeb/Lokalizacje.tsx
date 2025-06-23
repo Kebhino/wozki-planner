@@ -34,7 +34,7 @@ import { LuCheck, LuPencilLine, LuX } from "react-icons/lu";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { IoMdAdd } from "react-icons/io";
 import { v4 as uuidv4 } from "uuid";
-import SortableColumnHeader from "./SortowanieWKolumnie";
+import SortableColumnHeader from "./SortowanieLokalizacja";
 import { useGlobalDialogStore } from "./stores/useGlobalDialogStore";
 
 const { ToastContainer, toast } = createStandaloneToast();
@@ -46,7 +46,7 @@ const Lokalizacje = () => {
     useGlobalDialogStore();
 
   const [sortConfig, setSortConfig] = useState<SortConfig>({
-    type: "surname",
+    type: "lokalizacja",
     direction: "asc",
   });
 
@@ -128,9 +128,11 @@ const Lokalizacje = () => {
   const sortedParticipants = [...lokalizacje].sort((a, b) => {
     const { type, direction } = sortConfig;
 
-    const valA = type === "surname" ? a.name.toLowerCase() : a.active ? 1 : 0;
+    const valA =
+      type === "lokalizacja" ? a.name.toLowerCase() : a.active ? 1 : 0;
 
-    const valB = type === "surname" ? b.name.toLowerCase() : b.active ? 1 : 0;
+    const valB =
+      type === "lokalizacja" ? b.name.toLowerCase() : b.active ? 1 : 0;
 
     return direction === "asc"
       ? valA > valB
@@ -145,7 +147,7 @@ const Lokalizacje = () => {
       : 0;
   });
 
-  const handleSortChange = (type: "surname" | "status") => {
+  const handleSortChange = (type: "lokalizacja" | "status") => {
     setSortConfig((prev) => {
       if (prev.type === type) {
         // Jeśli kliniemy w tą samą kolumne to zmieni się kierunek sortowania
@@ -306,7 +308,7 @@ const Lokalizacje = () => {
             <Table.ColumnHeader fontWeight={"bold"}>
               <SortableColumnHeader
                 label="Lokalizacja"
-                sortKey="surname"
+                sortKey="lokalizacja"
                 currentSort={sortConfig.type}
                 sortAsc={sortConfig.direction === "asc"}
                 onSortChange={handleSortChange}

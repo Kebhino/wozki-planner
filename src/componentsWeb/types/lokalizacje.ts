@@ -13,6 +13,6 @@ export interface AddLocationProps {
 }
 
 export interface SortConfig {
-  type: "surname" | "status";
+  type: "lokalizacja" | "status";
   direction: "asc" | "desc";
 }
