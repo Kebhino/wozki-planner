@@ -279,7 +279,7 @@ const TablicaUczestnikow = () => {
       {/* Formularz */}
       <HStack gap={2}>
         <Input
-          placeholder="Dane nowego uczestnika"
+          placeholder="Dane nowego uczestnika lub wiele osób po przecinkach"
           variant="subtle"
           bg="white"
           color="black"
