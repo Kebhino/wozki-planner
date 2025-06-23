@@ -1,24 +1,16 @@
-export type Status = "Pionier St." | "Pionier Pom." | "Głosiciel";
-
-export interface AddParticipantProps {
+export interface Lokalizacja {
   id: string;
   name: string;
   active: boolean
-  status: Status;
+  
 }
 
-
-
-
-
-export interface Participant {
+export interface AddLocationProps {
   id: string;
   name: string;
   active: boolean
-  status: Status;
+  
 }
-
-
 
 export interface SortConfig {
   type: "surname" | "status";

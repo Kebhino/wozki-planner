@@ -67,7 +67,7 @@ const NavigationBar = () => {
               Uczestnicy
             </Text>
           </NavLink>
-          <NavLink to="/sloty">
+          <NavLink to="/lokalizacje">
             <Text
               position="relative"
               fontWeight={"400"}
@@ -79,10 +79,10 @@ const NavigationBar = () => {
                 left: 0,
                 width: "100%",
                 height: "2px",
-                background: isActive("/sloty")
+                background: isActive("/lokalizacje")
                   ? "linear-gradient(90deg, #6EBEFF, #3A8DFF)"
                   : "#cce7ff",
-                opacity: isActive("/sloty") ? 1 : 0.4,
+                opacity: isActive("/lokalizacje") ? 1 : 0.4,
                 transition: "all 0.3s ease",
               }}
               _hover={{
@@ -91,7 +91,7 @@ const NavigationBar = () => {
                 },
               }}
             >
-              Sloty
+              Lokalizacje
             </Text>
           </NavLink>
 

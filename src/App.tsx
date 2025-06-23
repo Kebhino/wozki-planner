@@ -1,9 +1,9 @@
 import { Route, Routes } from "react-router-dom";
-import MainPage from "./componentsWeb/MainPage/MainPage";
-
+import Lokalizacje from "./componentsWeb/Lokalizacje";
 import About from "./pages/About";
-import Contact from "./pages/Contact";
 import RealizacjeGrid from "./pages/RealizacjeGrid";
+import TablicaUczestnikow from "./componentsWeb/TablicaUczestnikow";
+import Layout from "./Layout/Layout";
 
 function App() {
   return (
@@ -14,17 +14,21 @@ function App() {
           path="/"
           element={
             <>
-              <MainPage />
+              <Layout>
+                <TablicaUczestnikow />
+              </Layout>
             </>
           }
         />
 
         {/* Podstrona Kontakt */}
         <Route
-          path="/sloty"
+          path="/lokalizacje"
           element={
             <>
-              <Contact />
+              <Layout>
+                <Lokalizacje />
+              </Layout>
             </>
           }
         />
