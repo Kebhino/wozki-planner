@@ -293,12 +293,6 @@ const TablicaUczestnikow = () => {
             }))
           }
         />
-        {/* <SortMenu
-          sortType={sortType}
-          sortAsc={sortAsc}
-          setSortType={setSortType}
-          setSortAsc={setSortAsc}
-        /> */}
 
         <StyledSelect
           value={newParticipant.status}
