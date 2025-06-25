@@ -18,6 +18,7 @@ import {
   Table,
   Text,
   useBreakpointValue,
+  VStack,
 } from "@chakra-ui/react";
 import type { ToastPosition } from "@chakra-ui/toast";
 import { createStandaloneToast } from "@chakra-ui/toast";
@@ -443,64 +444,6 @@ const Sloty = () => {
                   <Spinner ml={5} />
                 )}
               </Table.Cell>
-              {/* <Table.Cell>
-                {!czyPoleJestZapisywane(p.id, "name") ? (
-                  <Editable.Root
-                    defaultValue={p.name}
-                    submitMode={"enter"}
-                    disabled={czyPoleJestZapisywane(p.id, "name")}
-                    opacity={czyPoleJestZapisywane(p.id, "name") ? 0.4 : 1}
-                    onValueCommit={(val) => {
-                      dodajPoleDoMapy(p.id, "name");
-
-                      updateSlot(p.id, "name", val.value)
-                        .then(() => toast({ title: "Zmieniono imię" }))
-                        .finally(() => usunPoleZMapy(p.id, "name"));
-                    }}
-                  >
-                    <Editable.Preview />
-                    <Stack direction={{ base: "column", md: "row" }}>
-                      <Editable.Input />
-                      <Editable.Control>
-                        <Editable.EditTrigger asChild>
-                          <IconButton
-                            variant="ghost"
-                            size="xs"
-                            borderRadius={"full"}
-                            _hover={{
-                              bg: "green.500",
-                            }}
-                          >
-                            <LuPencilLine />
-                          </IconButton>
-                        </Editable.EditTrigger>
-                        <Editable.CancelTrigger asChild>
-                          <IconButton
-                            variant="outline"
-                            size={{ base: "2xs", md: "sm", lg: "sm" }}
-                            color={"red.600"}
-                            borderRadius={10}
-                          >
-                            <LuX />
-                          </IconButton>
-                        </Editable.CancelTrigger>
-                        <Editable.SubmitTrigger asChild>
-                          <IconButton
-                            variant="outline"
-                            size={{ base: "2xs", md: "sm", lg: "sm" }}
-                            color={"green.500"}
-                            borderRadius={10}
-                          >
-                            <LuCheck />
-                          </IconButton>
-                        </Editable.SubmitTrigger>
-                      </Editable.Control>
-                    </Stack>
-                  </Editable.Root>
-                ) : (
-                  <Spinner />
-                )} */}
-              {/* </Table.Cell> */}
               <Table.Cell>
                 <HStack>
                   <Text fontSize="sm">
@@ -585,9 +528,17 @@ const Sloty = () => {
                           <Dialog.Title>Jesteś pewien?</Dialog.Title>
                         </Dialog.Header>
                         <Dialog.Body>
-                          Czy jesteś pewien, że chcesz usunąć uczestnika:{" "}
+                          Czy jesteś pewien, że chcesz usunąć slot:{" "}
                           <Text fontWeight={"bold"} textAlign={"center"} mt={5}>
                             {p.name}
+                            <br />
+                            {p.data.toLocaleDateString("pl-PL", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                            })}
+                            <br />
+                            {p.from}:00 - {p.from + 1}:00
                           </Text>
                           {p.active && (
                             <Text textAlign="center" color="red" pt={5}>
