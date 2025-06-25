@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export const useSloty = () => {
   return useQuery<Slot[]>({
-    queryKey: ["slots"],
+    queryKey: ["sloty"],
     queryFn: ({ signal }) => getSlots(signal),
     staleTime: 1000 * 60 * 5,
   });

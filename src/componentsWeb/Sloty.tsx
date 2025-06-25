@@ -33,11 +33,13 @@ import { v4 as uuidv4 } from "uuid";
 import { addSlot, deleteSlotFromDb, updateSlotInDb } from "./api/sloty";
 import SortableColumnHeader from "./SortowanieSloty";
 import { useGlobalDialogStore } from "./stores/useGlobalDialogStore";
-import DatePicker from "react-datepicker";
+import DatePicker, { registerLocale } from "react-datepicker";
+import { pl } from "date-fns/locale";
 import "react-datepicker/dist/react-datepicker.css";
 
 const StyledSelect = chakra("select");
 const { ToastContainer, toast } = createStandaloneToast();
+registerLocale("pl", pl);
 
 const Sloty = () => {
   const queryClient = useQueryClient();
@@ -150,7 +152,7 @@ const Sloty = () => {
   const handleAddSlot = async () => {
     if (typeof newSlot.name !== "string" || !newSlot.name.trim()) {
       toast({
-        title: "Podaj imię i nazwisko",
+        title: "Wybierz Slt",
         status: "warning",
         duration: 3000,
         position,
@@ -226,7 +228,7 @@ const Sloty = () => {
         position,
         isClosable: true,
       });
-      queryClient.invalidateQueries({ queryKey: ["participants"] });
+      queryClient.invalidateQueries({ queryKey: ["sloty"] });
     } catch (error) {
       toast({
         title: "Błąd usuwania uczestnika",
@@ -267,10 +269,11 @@ const Sloty = () => {
           value={newSlot.name}
           bg="white"
           color="black"
-          fontSize={{ base: 10, md: 12, lg: 15 }}
+          fontSize={{ base: 12, md: 14, lg: 18 }}
           height={10}
           textAlign={"center"}
           borderRadius={5}
+          p={2}
           onChange={(e) =>
             setNewSlot((prev) => ({
               ...prev,
@@ -292,6 +295,8 @@ const Sloty = () => {
         </StyledSelect>
         <DatePicker
           selected={newSlot.data}
+          locale="pl"
+          dateFormat="dd.MM.yyyy"
           onChange={(date) => {
             if (date) {
               setNewSlot((prev) => ({
@@ -300,8 +305,9 @@ const Sloty = () => {
               }));
             }
           }}
+          className="custom-datepicker"
         />
-
+        📅
         <Button
           colorScheme="green"
           disabled={uzytkownikDodawany}

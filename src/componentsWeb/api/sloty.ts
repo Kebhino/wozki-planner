@@ -1,4 +1,4 @@
-import type { AddSlotProps } from "@/componentsWeb/types/participants";
+import type { AddSlotProps } from "@/componentsWeb/types/slots";
 import type { Slot } from "../types/slots";
 
 export const addSlot = async (payload: AddSlotProps) => {
