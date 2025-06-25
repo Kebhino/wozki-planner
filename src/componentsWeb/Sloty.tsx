@@ -292,7 +292,7 @@ const Sloty = () => {
         </StyledSelect>
         <DatePicker
           selected={newSlot.data}
-          onChange={(date: Date | null) => {
+          onChange={(date) => {
             if (date) {
               setNewSlot((prev) => ({
                 ...prev,
