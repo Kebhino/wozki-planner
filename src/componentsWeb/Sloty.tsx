@@ -88,7 +88,6 @@ const Sloty = () => {
       if (zaktualizowanaListaPol.length > 0) {
         nowaMapa.set(id, zaktualizowanaListaPol);
       } else nowaMapa.delete(id);
-      console.log(nowaMapa);
 
       return nowaMapa;
     });
@@ -110,7 +109,6 @@ const Sloty = () => {
 
   const slotsQuery = useSloty();
   const slots = slotsQuery.data || [];
-  console.log(slots);
 
   const sortedParticipants = [...slots].sort((a, b) => {
     const { type, direction } = sortConfig;
