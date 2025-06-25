@@ -4,6 +4,7 @@ import About from "./pages/About";
 import RealizacjeGrid from "./pages/RealizacjeGrid";
 import TablicaUczestnikow from "./componentsWeb/TablicaUczestnikow";
 import Layout from "./Layout/Layout";
+import Sloty from "./componentsWeb/Sloty";
 
 function App() {
   return (
@@ -28,6 +29,16 @@ function App() {
             <>
               <Layout>
                 <Lokalizacje />
+              </Layout>
+            </>
+          }
+        />
+        <Route
+          path="/sloty"
+          element={
+            <>
+              <Layout>
+                <Sloty />
               </Layout>
             </>
           }
