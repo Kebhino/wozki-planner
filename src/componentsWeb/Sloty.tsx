@@ -11,12 +11,9 @@ import {
   chakra,
   CloseButton,
   Dialog,
-  Editable,
   HStack,
-  IconButton,
   Portal,
   Spinner,
-  Stack,
   Switch,
   Table,
   Text,
@@ -25,17 +22,16 @@ import {
 import type { ToastPosition } from "@chakra-ui/toast";
 import { createStandaloneToast } from "@chakra-ui/toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { pl } from "date-fns/locale";
 import { useState } from "react";
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { IoMdAdd } from "react-icons/io";
-import { LuCheck, LuPencilLine, LuX } from "react-icons/lu";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { v4 as uuidv4 } from "uuid";
 import { addSlot, deleteSlotFromDb, updateSlotInDb } from "./api/sloty";
 import SortableColumnHeader from "./SortowanieSloty";
 import { useGlobalDialogStore } from "./stores/useGlobalDialogStore";
-import DatePicker, { registerLocale } from "react-datepicker";
-import { pl } from "date-fns/locale";
-import "react-datepicker/dist/react-datepicker.css";
 
 const StyledSelect = chakra("select");
 const { ToastContainer, toast } = createStandaloneToast();
@@ -300,11 +296,13 @@ const Sloty = () => {
               : "Wybierz lokalizację"}
           </option>
 
-          {lokalizacjeData.map((lokalizacja) => (
-            <option key={lokalizacja.name} value={lokalizacja.name}>
-              {lokalizacja.name}
-            </option>
-          ))}
+          {lokalizacjeData
+            .filter((lokalizacja) => lokalizacja.active)
+            .map((lokalizacja) => (
+              <option key={lokalizacja.name} value={lokalizacja.name}>
+                {lokalizacja.name}
+              </option>
+            ))}
         </StyledSelect>
         <DatePicker
           selected={newSlot.data}
@@ -402,6 +400,43 @@ const Sloty = () => {
             <Table.Row key={p.id}>
               <Table.Cell>
                 {!czyPoleJestZapisywane(p.id, "name") ? (
+                  <StyledSelect
+                    defaultValue={p.name}
+                    fontSize={{ base: "xs", md: "sm", lg: "sm" }}
+                    onChange={(e) => {
+                      dodajPoleDoMapy(p.id, "name");
+                      updateSlot(p.id, "name", e.target.value)
+                        .then(() =>
+                          toast({
+                            description: (
+                              <Text>
+                                Zmieniono lokalizacje na:{" "}
+                                <Text
+                                  as="span"
+                                  fontWeight="bold"
+                                  display="inline"
+                                >
+                                  {e.target.value}
+                                </Text>
+                              </Text>
+                            ),
+                          })
+                        )
+                        .finally(() => usunPoleZMapy(p.id, "name"));
+                    }}
+                  >
+                    {lokalizacjeData.map((lokalizacja) => (
+                      <option key={lokalizacja.name} value={lokalizacja.name}>
+                        {lokalizacja.name}
+                      </option>
+                    ))}
+                  </StyledSelect>
+                ) : (
+                  <Spinner ml={5} />
+                )}
+              </Table.Cell>
+              {/* <Table.Cell>
+                {!czyPoleJestZapisywane(p.id, "name") ? (
                   <Editable.Root
                     defaultValue={p.name}
                     submitMode={"enter"}
@@ -456,8 +491,8 @@ const Sloty = () => {
                   </Editable.Root>
                 ) : (
                   <Spinner />
-                )}
-              </Table.Cell>
+                )} */}
+              {/* </Table.Cell> */}
               <Table.Cell>
                 <HStack>
                   <Text fontSize="sm">
