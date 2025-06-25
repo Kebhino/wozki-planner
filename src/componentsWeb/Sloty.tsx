@@ -154,7 +154,7 @@ const Sloty = () => {
   const handleAddSlot = async () => {
     if (typeof newSlot.name !== "string" || !newSlot.name.trim()) {
       toast({
-        title: "Wybierz Slt",
+        title: "Wybierz Slot",
         status: "warning",
         duration: 3000,
         position,
@@ -182,6 +182,14 @@ const Sloty = () => {
 
       toast({
         title: "Dodano Slot",
+        description: `${newSlot.name} w dniu ${newSlot.data.toLocaleDateString(
+          "pl-PL",
+          {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }
+        )} godzina: ${newSlot.from}`,
         status: "success",
         duration: 4000,
         isClosable: true,
