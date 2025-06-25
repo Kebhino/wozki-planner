@@ -233,7 +233,7 @@ const Sloty = () => {
     try {
       await deleteSlotFromDb(id);
       toast({
-        title: "Uczestnik usunięty",
+        title: "Slot usunięty",
         status: "info",
         duration: 3000,
         position,
@@ -242,7 +242,7 @@ const Sloty = () => {
       queryClient.invalidateQueries({ queryKey: ["sloty"] });
     } catch (error) {
       toast({
-        title: "Błąd usuwania uczestnika",
+        title: "Błąd usuwania slota",
         status: "error",
         duration: 3000,
         position,
