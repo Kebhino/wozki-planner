@@ -18,7 +18,6 @@ import {
   Table,
   Text,
   useBreakpointValue,
-  VStack,
 } from "@chakra-ui/react";
 import type { ToastPosition } from "@chakra-ui/toast";
 import { createStandaloneToast } from "@chakra-ui/toast";
@@ -33,8 +32,8 @@ import { v4 as uuidv4 } from "uuid";
 import { addSlot, deleteSlotFromDb, updateSlotInDb } from "./api/sloty";
 import SortableColumnHeader from "./SortowanieSloty";
 import { useGlobalDialogStore } from "./stores/useGlobalDialogStore";
-
 const StyledSelect = chakra("select");
+
 const { ToastContainer, toast } = createStandaloneToast();
 registerLocale("pl", pl);
 const dostepneGodziny = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
@@ -261,22 +260,8 @@ const Sloty = () => {
       )}
       <ToastContainer />
       {/* Formularz */}
+
       <HStack gap={2}>
-        {/* <Input
-          placeholder="Dodaj nowy slot"
-          variant="subtle"
-          bg="white"
-          color="black"
-          height={10}
-          borderRadius={5}
-          value={newSlot.name}
-          onChange={(e) =>
-            setNewSlot((prev) => ({
-              ...prev,
-              name: e.target.value,
-            }))
-          }
-        /> */}
         <StyledSelect
           value={newSlot.name}
           bg="white"
@@ -358,6 +343,7 @@ const Sloty = () => {
             </option>
           ))}
         </StyledSelect>
+        ⏰
         <Button
           colorScheme="green"
           disabled={uzytkownikDodawany}
@@ -396,6 +382,7 @@ const Sloty = () => {
                 onSortChange={handleSortChange}
               />
             </Table.ColumnHeader>
+
             <Table.ColumnHeader>Aktywny</Table.ColumnHeader>
             <Table.ColumnHeader>Godziny</Table.ColumnHeader>
             <Table.ColumnHeader>Akcje</Table.ColumnHeader>
