@@ -248,6 +248,8 @@ const Sloty = () => {
     }
   };
 
+  const isMobile = window.innerWidth < 768; // funkcja pomocnicza zeby ogarnac responsywnosc selektorów
+
   return (
     <Box pt={4}>
       {slotsQuery.isLoading && <p>Ładowanie slotów...</p>}
@@ -276,7 +278,7 @@ const Sloty = () => {
           value={newSlot.name}
           bg="white"
           color="black"
-          fontSize={{ base: 12, md: 14, lg: 18 }}
+          fontSize={{ base: 12, md: 14, lg: 16 }}
           height={10}
           textAlign={"center"}
           borderRadius={5}
@@ -290,8 +292,12 @@ const Sloty = () => {
         >
           <option value="" disabled hidden>
             {lokalizacjeQuery.isLoading
-              ? "Ładowanie lokalizacji..."
-              : "Wybierz lokalizacje"}
+              ? isMobile
+                ? "Ładowanie..."
+                : "Ładowanie lokalizacji..."
+              : isMobile
+              ? "Lokalizacja"
+              : "Wybierz lokalizację"}
           </option>
 
           {lokalizacjeData.map((lokalizacja) => (
@@ -316,14 +322,14 @@ const Sloty = () => {
         />
         📅
         <StyledSelect
-          value={newSlot.from}
+          value={newSlot.from === 0 ? "" : newSlot.from}
           bg="white"
           color="black"
-          fontSize={{ base: 12, md: 14, lg: 18 }}
+          fontSize={{ base: 12, md: 14, lg: 16 }}
           height={10}
           textAlign={"center"}
           borderRadius={5}
-          p={2}
+          px={5}
           onChange={(e) => {
             setNewSlot((prev) => ({
               ...prev,
@@ -332,9 +338,13 @@ const Sloty = () => {
           }}
         >
           <option value="" disabled hidden>
-            {lokalizacjeQuery.isLoading
-              ? "Ładowanie godzin"
-              : "Wybierz lokalizacje"}
+            {slotsQuery.isLoading
+              ? isMobile
+                ? "Ładowanie..."
+                : "Ładowanie godzin"
+              : isMobile
+              ? "Godzina"
+              : "Wybierz lokalizację"}
           </option>
 
           {dostepneGodziny.map((godzina, index) => (
@@ -347,13 +357,13 @@ const Sloty = () => {
           colorScheme="green"
           disabled={uzytkownikDodawany}
           onClick={handleAddSlot}
-          bg="white"
-          color="black"
+          bg="green.400"
+          color="white"
           height={10}
           fontSize={{ base: 8, md: 12, lg: 15 }}
           textAlign={"center"}
           borderRadius={10}
-          _hover={{ bg: "green.400", color: "white" }}
+          _hover={{ bg: "green.300", color: "white" }}
         >
           {uzytkownikDodawany ? <Spinner /> : <IoMdAdd />}
         </Button>
@@ -381,6 +391,7 @@ const Sloty = () => {
                 onSortChange={handleSortChange}
               />
             </Table.ColumnHeader>
+            <Table.ColumnHeader>Aktywny</Table.ColumnHeader>
             <Table.ColumnHeader>Godziny</Table.ColumnHeader>
             <Table.ColumnHeader>Akcje</Table.ColumnHeader>
           </Table.Row>
@@ -456,37 +467,38 @@ const Sloty = () => {
                       year: "numeric",
                     })}
                   </Text>
-
-                  {!czyPoleJestZapisywane(p.id, "active") ? (
-                    <Switch.Root
-                      ml={5}
-                      colorPalette={"green"}
-                      checked={p.active}
-                      size={{ base: "xs", md: "sm", lg: "md" }}
-                    >
-                      <Switch.HiddenInput
-                        onChange={(e) => {
-                          dodajPoleDoMapy(p.id, "active");
-                          updateSlot(p.id, "active", e.target.checked)
-                            .then(() =>
-                              toast({
-                                title: e.target.checked
-                                  ? "Uczestnik aktywny"
-                                  : "Uczestnik nieaktywny",
-                              })
-                            )
-                            .finally(() => usunPoleZMapy(p.id, "active"));
-                        }}
-                      />
-                      <Switch.Control>
-                        <Switch.Thumb />
-                      </Switch.Control>
-                      <Switch.Label />
-                    </Switch.Root>
-                  ) : (
-                    <Spinner ml={7} />
-                  )}
                 </HStack>
+              </Table.Cell>
+              <Table.Cell>
+                {!czyPoleJestZapisywane(p.id, "active") ? (
+                  <Switch.Root
+                    ml={5}
+                    colorPalette={"green"}
+                    checked={p.active}
+                    size={{ base: "xs", md: "sm", lg: "md" }}
+                  >
+                    <Switch.HiddenInput
+                      onChange={(e) => {
+                        dodajPoleDoMapy(p.id, "active");
+                        updateSlot(p.id, "active", e.target.checked)
+                          .then(() =>
+                            toast({
+                              title: e.target.checked
+                                ? "Uczestnik aktywny"
+                                : "Uczestnik nieaktywny",
+                            })
+                          )
+                          .finally(() => usunPoleZMapy(p.id, "active"));
+                      }}
+                    />
+                    <Switch.Control>
+                      <Switch.Thumb />
+                    </Switch.Control>
+                    <Switch.Label />
+                  </Switch.Root>
+                ) : (
+                  <Spinner ml={7} />
+                )}
               </Table.Cell>
               <Table.Cell>
                 <Text>
