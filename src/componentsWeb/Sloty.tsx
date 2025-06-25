@@ -40,6 +40,7 @@ import "react-datepicker/dist/react-datepicker.css";
 const StyledSelect = chakra("select");
 const { ToastContainer, toast } = createStandaloneToast();
 registerLocale("pl", pl);
+const dostepneGodziny = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
 
 const Sloty = () => {
   const queryClient = useQueryClient();
@@ -104,6 +105,7 @@ const Sloty = () => {
     name: "",
     data: new Date(),
     active: true,
+    from: 0,
   });
 
   const lokalizacjeQuery = useLokalizacje();
@@ -111,24 +113,28 @@ const Sloty = () => {
 
   const slotsQuery = useSloty();
   const slots = slotsQuery.data || [];
-  console.log(slots, "To są sloty");
+  console.log(slots);
 
   const sortedParticipants = [...slots].sort((a, b) => {
     const { type, direction } = sortConfig;
 
-    const valA =
-      type === "surname"
-        ? a.name.split(" ").slice(-1)[0].toLowerCase()
-        : a.data.toLowerCase();
+    let valA: string | number;
+    let valB: string | number;
 
-    const valB =
-      type === "surname"
-        ? b.name.split(" ").slice(-1)[0].toLowerCase()
-        : b.data.toLowerCase();
+    if (type === "surname") {
+      valA = a.name.split(" ").slice(-1)[0].toLowerCase();
+      valB = b.name.split(" ").slice(-1)[0].toLowerCase();
+      return direction === "asc"
+        ? valA.localeCompare(valB, "pl")
+        : valB.localeCompare(valA, "pl");
+    } else if (type === "data") {
+      const timeA = a.data.getTime(); // liczba milisekund
+      const timeB = b.data.getTime();
 
-    return direction === "asc"
-      ? valA.localeCompare(valB, "pl")
-      : valB.localeCompare(valA, "pl");
+      return direction === "asc" ? timeA - timeB : timeB - timeA;
+    }
+
+    return 0;
   });
 
   const handleSortChange = (type: "surname" | "data") => {
@@ -167,6 +173,7 @@ const Sloty = () => {
       active: newSlot.active,
       name: newSlot.name,
       data: newSlot.data.toLocaleDateString(),
+      from: newSlot.from,
     };
 
     try {
@@ -174,7 +181,7 @@ const Sloty = () => {
       await addSlot(payload);
 
       queryClient.invalidateQueries({ queryKey: ["sloty"] });
-      setNewSlot({ name: "", data: new Date(), active: true });
+      setNewSlot({ name: "", data: new Date(), active: true, from: 0 });
       setUzytkownikDodawany(false);
 
       toast({
@@ -308,6 +315,34 @@ const Sloty = () => {
           className="custom-datepicker"
         />
         📅
+        <StyledSelect
+          value={newSlot.from}
+          bg="white"
+          color="black"
+          fontSize={{ base: 12, md: 14, lg: 18 }}
+          height={10}
+          textAlign={"center"}
+          borderRadius={5}
+          p={2}
+          onChange={(e) => {
+            setNewSlot((prev) => ({
+              ...prev,
+              from: parseInt(e.target.value),
+            }));
+          }}
+        >
+          <option value="" disabled hidden>
+            {lokalizacjeQuery.isLoading
+              ? "Ładowanie godzin"
+              : "Wybierz lokalizacje"}
+          </option>
+
+          {dostepneGodziny.map((godzina, index) => (
+            <option key={index} value={godzina}>
+              {godzina}
+            </option>
+          ))}
+        </StyledSelect>
         <Button
           colorScheme="green"
           disabled={uzytkownikDodawany}
@@ -323,6 +358,7 @@ const Sloty = () => {
           {uzytkownikDodawany ? <Spinner /> : <IoMdAdd />}
         </Button>
       </HStack>
+
       {/* Tabela */}
       <Table.Root width="100%" mt={3} color={"black"} interactive>
         <Table.Header>
@@ -338,13 +374,14 @@ const Sloty = () => {
             </Table.ColumnHeader>
             <Table.ColumnHeader>
               <SortableColumnHeader
-                label="Status"
+                label="Data"
                 sortKey="data"
                 currentSort={sortConfig.type}
                 sortAsc={sortConfig.direction === "asc"}
                 onSortChange={handleSortChange}
               />
             </Table.ColumnHeader>
+            <Table.ColumnHeader>Godziny</Table.ColumnHeader>
             <Table.ColumnHeader>Akcje</Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
@@ -412,7 +449,13 @@ const Sloty = () => {
               </Table.Cell>
               <Table.Cell>
                 <HStack>
-                  <Text fontSize="sm">{p.data}</Text>
+                  <Text fontSize="sm">
+                    {new Date(p.data).toLocaleDateString("pl-PL", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    })}
+                  </Text>
 
                   {!czyPoleJestZapisywane(p.id, "active") ? (
                     <Switch.Root
@@ -444,6 +487,11 @@ const Sloty = () => {
                     <Spinner ml={7} />
                   )}
                 </HStack>
+              </Table.Cell>
+              <Table.Cell>
+                <Text>
+                  {p.from}:00 - {p.from + 1}:00
+                </Text>
               </Table.Cell>
               <Table.Cell>
                 <Dialog.Root role="alertdialog" open={idDoUsuniecia === p.id}>

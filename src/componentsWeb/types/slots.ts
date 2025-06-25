@@ -5,19 +5,14 @@ export interface AddSlotProps {
   name: string;
   active: boolean
   data: string;
+  from: number
 }
-
-
-
-
-
-
-
 export interface Slot {
   id: string;
   name: string;
   active: boolean
   data: Date
+  from: number
 }
 
 
@@ -26,3 +21,4 @@ export interface SortConfig {
   type: "surname" | "data";
   direction: "asc" | "desc";
 }
+

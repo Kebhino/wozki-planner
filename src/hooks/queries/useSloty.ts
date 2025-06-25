@@ -1,5 +1,5 @@
 import { getSlots } from "@/componentsWeb/api/sloty";
-import type { Slot } from "@/componentsWeb/types/participants";
+import type { Slot } from "@/componentsWeb/types/slots";
 import { useQuery } from "@tanstack/react-query";
 
 export const useSloty = () => {

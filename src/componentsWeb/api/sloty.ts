@@ -16,7 +16,18 @@ export const getSlots = async (signal?: AbortSignal) => {
   const res = await fetch("https://gngp5xd4ol.execute-api.eu-central-1.amazonaws.com/sloty", {signal});
   if (!res.ok) throw new Error("Błąd pobierania slotów");
   const data = await res.json();
-  return data.items;
+  console.log("🐞 Surowe dane slotów:", data.items);
+  return data.items.map((item: any) => {
+    console.log("➡️ Otrzymany item.data:", item.data); // ⬅️ TU 👈
+
+    return {
+      id: item.id,
+      name: item.name,
+      active: item.active,
+      from: Number(item.from),
+      data: item.data ? new Date(item.data) : null,
+    };
+  });
 };
 
 export const updateSlotInDb = async (
