@@ -1,9 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
 import { getSlots } from "@/componentsWeb/api/sloty";
-import type { Participant } from "@/componentsWeb/types/participants";
+import type { Slot } from "@/componentsWeb/types/participants";
+import { useQuery } from "@tanstack/react-query";
 
 export const useSloty = () => {
-  return useQuery<Participant[]>({
+  return useQuery<Slot[]>({
     queryKey: ["slots"],
     queryFn: ({ signal }) => getSlots(signal),
     staleTime: 1000 * 60 * 5,

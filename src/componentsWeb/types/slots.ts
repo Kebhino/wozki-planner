@@ -17,12 +17,12 @@ export interface Slot {
   id: string;
   name: string;
   active: boolean
-  data: string
+  data: Date
 }
 
 
 
 export interface SortConfig {
-  type: "surname" | "status";
+  type: "surname" | "data";
   direction: "asc" | "desc";
 }

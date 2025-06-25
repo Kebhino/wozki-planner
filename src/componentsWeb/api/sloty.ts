@@ -1,4 +1,5 @@
-import type { AddSlotProps, Participant } from "@/componentsWeb/types/participants";
+import type { AddSlotProps } from "@/componentsWeb/types/participants";
+import type { Slot } from "../types/slots";
 
 export const addSlot = async (payload: AddSlotProps) => {
   const res = await fetch("https://gngp5xd4ol.execute-api.eu-central-1.amazonaws.com/sloty", {
@@ -20,7 +21,7 @@ export const getSlots = async (signal?: AbortSignal) => {
 
 export const updateSlotInDb = async (
   id: string,
-  field: keyof Participant,
+  field: keyof Slot,
   value: string | boolean
 ) => {
   const res = await fetch(

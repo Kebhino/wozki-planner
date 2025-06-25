@@ -31,13 +31,13 @@ import { LuCheck, LuPencilLine, LuX } from "react-icons/lu";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { v4 as uuidv4 } from "uuid";
 import { addSlot, deleteSlotFromDb, updateSlotInDb } from "./api/sloty";
-import SortableColumnHeader from "./SortowanieWKolumnie";
+import SortableColumnHeader from "./SortowanieSloty";
 import { useGlobalDialogStore } from "./stores/useGlobalDialogStore";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const StyledSelect = chakra("select");
 const { ToastContainer, toast } = createStandaloneToast();
-
-const statusOptions: Status[] = ["Pionier St.", "Pionier Pom.", "Głosiciel"];
 
 const Sloty = () => {
   const queryClient = useQueryClient();
@@ -100,7 +100,7 @@ const Sloty = () => {
   }) as ToastPosition;
   const [newSlot, setNewSlot] = useState<Omit<Slot, "id">>({
     name: "",
-    data: "",
+    data: new Date(),
     active: true,
   });
 
@@ -109,6 +109,7 @@ const Sloty = () => {
 
   const slotsQuery = useSloty();
   const slots = slotsQuery.data || [];
+  console.log(slots, "To są sloty");
 
   const sortedParticipants = [...slots].sort((a, b) => {
     const { type, direction } = sortConfig;
@@ -116,19 +117,19 @@ const Sloty = () => {
     const valA =
       type === "surname"
         ? a.name.split(" ").slice(-1)[0].toLowerCase()
-        : a.status.toLowerCase();
+        : a.data.toLowerCase();
 
     const valB =
       type === "surname"
         ? b.name.split(" ").slice(-1)[0].toLowerCase()
-        : b.status.toLowerCase();
+        : b.data.toLowerCase();
 
     return direction === "asc"
       ? valA.localeCompare(valB, "pl")
       : valB.localeCompare(valA, "pl");
   });
 
-  const handleSortChange = (type: "surname" | "status") => {
+  const handleSortChange = (type: "surname" | "data") => {
     setSortConfig((prev) => {
       if (prev.type === type) {
         // Jeśli kliniemy w tą samą kolumne to zmieni się kierunek sortowania
@@ -163,7 +164,7 @@ const Sloty = () => {
       id: uuidv4(),
       active: newSlot.active,
       name: newSlot.name,
-      data: new Date().toLocaleDateString(),
+      data: newSlot.data.toLocaleDateString(),
     };
 
     try {
@@ -171,7 +172,7 @@ const Sloty = () => {
       await addSlot(payload);
 
       queryClient.invalidateQueries({ queryKey: ["sloty"] });
-      setNewSlot({ name: "", data: "", active: true });
+      setNewSlot({ name: "", data: new Date(), active: true });
       setUzytkownikDodawany(false);
 
       toast({
@@ -197,12 +198,12 @@ const Sloty = () => {
 
   const updateSlot = async (
     id: string,
-    field: keyof Participant,
+    field: keyof Slot,
     value: string | boolean
   ) => {
     try {
       await updateSlotInDb(id, field, value);
-      await queryClient.invalidateQueries({ queryKey: ["participants"] });
+      await queryClient.invalidateQueries({ queryKey: ["sloty"] });
     } catch (error) {
       toast({
         title: "Błąd aktualizacji",
@@ -289,6 +290,17 @@ const Sloty = () => {
             </option>
           ))}
         </StyledSelect>
+        <DatePicker
+          selected={newSlot.data}
+          onChange={(date: Date | null) => {
+            if (date) {
+              setNewSlot((prev) => ({
+                ...prev,
+                data: date,
+              }));
+            }
+          }}
+        />
 
         <Button
           colorScheme="green"
@@ -321,7 +333,7 @@ const Sloty = () => {
             <Table.ColumnHeader>
               <SortableColumnHeader
                 label="Status"
-                sortKey="status"
+                sortKey="data"
                 currentSort={sortConfig.type}
                 sortAsc={sortConfig.direction === "asc"}
                 onSortChange={handleSortChange}
@@ -394,41 +406,8 @@ const Sloty = () => {
               </Table.Cell>
               <Table.Cell>
                 <HStack>
-                  {!czyPoleJestZapisywane(p.id, "status") ? (
-                    <StyledSelect
-                      defaultValue={p.status}
-                      fontSize={{ base: "xs", md: "sm", lg: "sm" }}
-                      onChange={(e) => {
-                        dodajPoleDoMapy(p.id, "status");
-                        updateSlot(p.id, "status", e.target.value)
-                          .then(() =>
-                            toast({
-                              description: (
-                                <Text>
-                                  Zmieniono status uczestnika {p.name} na:{" "}
-                                  <Text
-                                    as="span"
-                                    fontWeight="bold"
-                                    display="inline"
-                                  >
-                                    {e.target.value}
-                                  </Text>
-                                </Text>
-                              ),
-                            })
-                          )
-                          .finally(() => usunPoleZMapy(p.id, "status"));
-                      }}
-                    >
-                      {statusOptions.map((status) => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </StyledSelect>
-                  ) : (
-                    <Spinner ml={5} />
-                  )}
+                  <Text fontSize="sm">{p.data}</Text>
+
                   {!czyPoleJestZapisywane(p.id, "active") ? (
                     <Switch.Root
                       ml={5}
