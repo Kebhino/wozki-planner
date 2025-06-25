@@ -1,11 +1,4 @@
-export type Status = "Pionier St." | "Pionier Pom." | "Głosiciel";
 
-export interface AddParticipantProps {
-  id: string;
-  name: string;
-  active: boolean
-  status: Status;
-}
 
 export interface AddSlotProps {
   id: string;
@@ -18,12 +11,7 @@ export interface AddSlotProps {
 
 
 
-export interface Participant {
-  id: string;
-  name: string;
-  active: boolean
-  status: Status;
-}
+
 
 export interface Slot {
   id: string;

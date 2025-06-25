@@ -1,43 +1,39 @@
-import {
-  addParticipant,
-  deleteParticipantFromDb,
-  getParticipants,
-  updateParticipantInDb,
-} from "@/componentsWeb/api/participants";
 import type {
-  AddParticipantProps,
-  Participant,
+  AddSlotProps,
+  Slot,
   SortConfig,
-  Status,
-} from "@/componentsWeb/types/participants";
+} from "@/componentsWeb/types/slots";
+import { useLokalizacje } from "@/hooks/queries/useLokalizacje";
+import { useSloty } from "@/hooks/queries/useSloty";
 import {
   Box,
   Button,
   chakra,
+  CloseButton,
+  Dialog,
   Editable,
   HStack,
   IconButton,
-  Input,
-  CloseButton,
-  Dialog,
   Portal,
-  Table,
-  useBreakpointValue,
-  Text,
   Spinner,
   Stack,
+  Switch,
+  Table,
+  Text,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import type { ToastPosition } from "@chakra-ui/toast";
 import { createStandaloneToast } from "@chakra-ui/toast";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Switch } from "@chakra-ui/react";
+import { IoMdAdd } from "react-icons/io";
 import { LuCheck, LuPencilLine, LuX } from "react-icons/lu";
 import { MdOutlineDeleteForever } from "react-icons/md";
-import { IoMdAdd } from "react-icons/io";
 import { v4 as uuidv4 } from "uuid";
+import { addSlot, deleteSlotFromDb, updateSlotInDb } from "./api/sloty";
 import SortableColumnHeader from "./SortowanieWKolumnie";
 import { useGlobalDialogStore } from "./stores/useGlobalDialogStore";
+
 const StyledSelect = chakra("select");
 const { ToastContainer, toast } = createStandaloneToast();
 
@@ -102,38 +98,19 @@ const Sloty = () => {
     base: "top",
     lg: "bottom",
   }) as ToastPosition;
-  const [newParticipant, setNewParticipant] = useState<Omit<Participant, "id">>(
-    {
-      name: "",
-      status: "Głosiciel",
-      active: true,
-    }
-  );
-
-  const {
-    data: participants = [],
-    isLoading,
-    isError,
-    error,
-  } = useQuery<Participant[]>({
-    queryKey: ["participants"],
-    queryFn: ({ signal }) => getParticipants(signal),
-    staleTime: 1000 * 60 * 5, // 5 min cache
+  const [newSlot, setNewSlot] = useState<Omit<Slot, "id">>({
+    name: "",
+    data: "",
+    active: true,
   });
 
-  if (isLoading) {
-    return <p>Ładowanie danych uczestników...</p>;
-  }
+  const lokalizacjeQuery = useLokalizacje();
+  const lokalizacjeData = lokalizacjeQuery.data || [];
 
-  if (isError) {
-    return (
-      <Box>
-        <p>Błąd wczytywania danych: {(error as Error).message}</p>
-      </Box>
-    );
-  }
+  const slotsQuery = useSloty();
+  const slots = slotsQuery.data || [];
 
-  const sortedParticipants = [...participants].sort((a, b) => {
+  const sortedParticipants = [...slots].sort((a, b) => {
     const { type, direction } = sortConfig;
 
     const valA =
@@ -169,11 +146,8 @@ const Sloty = () => {
     });
   };
 
-  const handleAddParticipant = async () => {
-    if (
-      typeof newParticipant.name !== "string" ||
-      !newParticipant.name.trim()
-    ) {
+  const handleAddSlot = async () => {
+    if (typeof newSlot.name !== "string" || !newSlot.name.trim()) {
       toast({
         title: "Podaj imię i nazwisko",
         status: "warning",
@@ -185,31 +159,23 @@ const Sloty = () => {
       return;
     }
 
-    const names = newParticipant.name
-      .split(",")
-      .map((name) => name.trim())
-      .filter((name) => name.length > 0);
+    const payload: AddSlotProps = {
+      id: uuidv4(),
+      active: newSlot.active,
+      name: newSlot.name,
+      data: new Date().toLocaleDateString(),
+    };
 
     try {
       setUzytkownikDodawany(true);
-      for (const name of names) {
-        const payload: AddParticipantProps = {
-          id: uuidv4(),
-          active: newParticipant.active,
-          name: name,
-          status: newParticipant.status,
-        };
-        await addParticipant(payload);
-      }
-      queryClient.invalidateQueries({ queryKey: ["participants"] });
-      setNewParticipant({ name: "", status: "Głosiciel", active: true });
+      await addSlot(payload);
+
+      queryClient.invalidateQueries({ queryKey: ["sloty"] });
+      setNewSlot({ name: "", data: "", active: true });
       setUzytkownikDodawany(false);
 
       toast({
-        title:
-          names.length > 1
-            ? `Dodano ${names.length} uczestników`
-            : "Dodano uczestnika",
+        title: "Dodano Slot",
         status: "success",
         duration: 4000,
         isClosable: true,
@@ -229,13 +195,13 @@ const Sloty = () => {
     }
   };
 
-  const updateParticipant = async (
+  const updateSlot = async (
     id: string,
     field: keyof Participant,
     value: string | boolean
   ) => {
     try {
-      await updateParticipantInDb(id, field, value);
+      await updateSlotInDb(id, field, value);
       await queryClient.invalidateQueries({ queryKey: ["participants"] });
     } catch (error) {
       toast({
@@ -249,9 +215,9 @@ const Sloty = () => {
     }
   };
 
-  const deleteParticipant = async (id: string) => {
+  const deleteSlot = async (id: string) => {
     try {
-      await deleteParticipantFromDb(id);
+      await deleteSlotFromDb(id);
       toast({
         title: "Uczestnik usunięty",
         status: "info",
@@ -274,28 +240,30 @@ const Sloty = () => {
 
   return (
     <Box pt={4}>
+      {slotsQuery.isLoading && <p>Ładowanie slotów...</p>}
+      {slotsQuery.error && (
+        <p>Błąd wczytywania danych: {(slotsQuery.error as Error).message}</p>
+      )}
       <ToastContainer />
-
       {/* Formularz */}
       <HStack gap={2}>
-        <Input
-          placeholder="Dane nowego uczestnika lub wiele osób po przecinkach"
+        {/* <Input
+          placeholder="Dodaj nowy slot"
           variant="subtle"
           bg="white"
           color="black"
           height={10}
           borderRadius={5}
-          value={newParticipant.name}
+          value={newSlot.name}
           onChange={(e) =>
-            setNewParticipant((prev) => ({
+            setNewSlot((prev) => ({
               ...prev,
               name: e.target.value,
             }))
           }
-        />
-
+        /> */}
         <StyledSelect
-          value={newParticipant.status}
+          value={newSlot.name}
           bg="white"
           color="black"
           fontSize={{ base: 10, md: 12, lg: 15 }}
@@ -303,15 +271,21 @@ const Sloty = () => {
           textAlign={"center"}
           borderRadius={5}
           onChange={(e) =>
-            setNewParticipant((prev) => ({
+            setNewSlot((prev) => ({
               ...prev,
-              status: e.target.value as Status,
+              name: e.target.value,
             }))
           }
         >
-          {statusOptions.map((status) => (
-            <option key={status} value={status}>
-              {status}
+          <option value="" disabled hidden>
+            {lokalizacjeQuery.isLoading
+              ? "Ładowanie lokalizacji..."
+              : "Wybierz lokalizacje"}
+          </option>
+
+          {lokalizacjeData.map((lokalizacja) => (
+            <option key={lokalizacja.name} value={lokalizacja.name}>
+              {lokalizacja.name}
             </option>
           ))}
         </StyledSelect>
@@ -319,7 +293,7 @@ const Sloty = () => {
         <Button
           colorScheme="green"
           disabled={uzytkownikDodawany}
-          onClick={handleAddParticipant}
+          onClick={handleAddSlot}
           bg="white"
           color="black"
           height={10}
@@ -331,14 +305,13 @@ const Sloty = () => {
           {uzytkownikDodawany ? <Spinner /> : <IoMdAdd />}
         </Button>
       </HStack>
-
       {/* Tabela */}
       <Table.Root width="100%" mt={3} color={"black"} interactive>
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeader fontWeight={"bold"}>
               <SortableColumnHeader
-                label="Imię i nazwisko"
+                label="Sloty"
                 sortKey="surname"
                 currentSort={sortConfig.type}
                 sortAsc={sortConfig.direction === "asc"}
@@ -371,7 +344,7 @@ const Sloty = () => {
                     onValueCommit={(val) => {
                       dodajPoleDoMapy(p.id, "name");
 
-                      updateParticipant(p.id, "name", val.value)
+                      updateSlot(p.id, "name", val.value)
                         .then(() => toast({ title: "Zmieniono imię" }))
                         .finally(() => usunPoleZMapy(p.id, "name"));
                     }}
@@ -427,7 +400,7 @@ const Sloty = () => {
                       fontSize={{ base: "xs", md: "sm", lg: "sm" }}
                       onChange={(e) => {
                         dodajPoleDoMapy(p.id, "status");
-                        updateParticipant(p.id, "status", e.target.value)
+                        updateSlot(p.id, "status", e.target.value)
                           .then(() =>
                             toast({
                               description: (
@@ -466,7 +439,7 @@ const Sloty = () => {
                       <Switch.HiddenInput
                         onChange={(e) => {
                           dodajPoleDoMapy(p.id, "active");
-                          updateParticipant(p.id, "active", e.target.checked)
+                          updateSlot(p.id, "active", e.target.checked)
                             .then(() =>
                               toast({
                                 title: e.target.checked
@@ -550,7 +523,7 @@ const Sloty = () => {
                             colorPalette="red"
                             onClick={() => {
                               resetIdDoUsuniecia();
-                              deleteParticipant(p.id).finally(() =>
+                              deleteSlot(p.id).finally(() =>
                                 usunPoleZMapy(p.id, "usun")
                               );
                             }}
