@@ -342,7 +342,7 @@ const Sloty = () => {
                 : "Ładowanie godzin"
               : isMobile
               ? "Godzina"
-              : "Wybierz lokalizację"}
+              : "Wybierz godzinę"}
           </option>
 
           {dostepneGodziny.map((godzina, index) => (
@@ -401,7 +401,7 @@ const Sloty = () => {
               <Table.Cell>
                 {!czyPoleJestZapisywane(p.id, "name") ? (
                   <StyledSelect
-                    defaultValue={p.name}
+                    value={p.name}
                     fontSize={{ base: "xs", md: "sm", lg: "sm" }}
                     onChange={(e) => {
                       dodajPoleDoMapy(p.id, "name");
