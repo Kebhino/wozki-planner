@@ -211,7 +211,7 @@ const Sloty = () => {
     }
   };
 
-  const isMobile = window.innerWidth < 768; // funkcja pomocnicza zeby ogarnac responsywnosc selektorów
+  const isMobile = window.innerWidth < 768; // zmienna pomocnicza zeby ogarnac responsywnosc selektorów
 
   return (
     <Box pt={4}>
@@ -351,16 +351,16 @@ const Sloty = () => {
         </Table.Header>
 
         <Table.Body>
-          {sortedParticipants.map((p) => (
-            <Table.Row key={p.id}>
+          {sortedParticipants.map((s) => (
+            <Table.Row key={s.id}>
               <Table.Cell>
-                {!sprawdzCzyEdytowane(p.id, "name") ? (
+                {!sprawdzCzyEdytowane(s.id, "name") ? (
                   <StyledSelect
-                    value={p.name || ""}
+                    value={s.name || ""}
                     fontSize={{ base: "xs", md: "sm", lg: "sm" }}
                     onChange={(e) => {
-                      dodajPoleDoMapy(p.id, "name");
-                      updateSlot(p.id, "name", e.target.value)
+                      dodajPoleDoMapy(s.id, "name");
+                      updateSlot(s.id, "name", e.target.value)
                         .then(() =>
                           toast({
                             description: (
@@ -377,7 +377,7 @@ const Sloty = () => {
                             ),
                           })
                         )
-                        .finally(() => usunPoleZMapy(p.id, "name"));
+                        .finally(() => usunPoleZMapy(s.id, "name"));
                     }}
                   >
                     <option
@@ -393,11 +393,21 @@ const Sloty = () => {
                         ? "Lokalizacja"
                         : "Wybierz lokalizację"}
                     </option>
-                    {lokalizacjeData.map((lokalizacja) => (
-                      <option key={lokalizacja.name} value={lokalizacja.name}>
-                        {lokalizacja.name}
-                      </option>
-                    ))}
+                    {[
+                      ...lokalizacjeData,
+                      ...(s.name &&
+                      !lokalizacjeData.some(
+                        (l) => l.name === s.name && l.active
+                      )
+                        ? [{ id: uuidv4(), name: s.name, active: true }]
+                        : []),
+                    ]
+                      .filter((lokalizacja) => lokalizacja.active)
+                      .map((lokalizacja) => (
+                        <option key={lokalizacja.name} value={lokalizacja.name}>
+                          {lokalizacja.name}
+                        </option>
+                      ))}
                   </StyledSelect>
                 ) : (
                   <Spinner ml={5} />
@@ -406,7 +416,7 @@ const Sloty = () => {
               <Table.Cell>
                 <HStack>
                   <Text fontSize="sm">
-                    {new Date(p.data).toLocaleDateString("pl-PL", {
+                    {new Date(s.data).toLocaleDateString("pl-PL", {
                       day: "2-digit",
                       month: "2-digit",
                       year: "numeric",
@@ -415,17 +425,17 @@ const Sloty = () => {
                 </HStack>
               </Table.Cell>
               <Table.Cell>
-                {!sprawdzCzyEdytowane(p.id, "active") ? (
+                {!sprawdzCzyEdytowane(s.id, "active") ? (
                   <Switch.Root
                     ml={5}
                     colorPalette={"green"}
-                    checked={p.active}
+                    checked={s.active}
                     size={{ base: "xs", md: "sm", lg: "md" }}
                   >
                     <Switch.HiddenInput
                       onChange={(e) => {
-                        dodajPoleDoMapy(p.id, "active");
-                        updateSlot(p.id, "active", e.target.checked)
+                        dodajPoleDoMapy(s.id, "active");
+                        updateSlot(s.id, "active", e.target.checked)
                           .then(() =>
                             toast({
                               title: e.target.checked
@@ -433,7 +443,7 @@ const Sloty = () => {
                                 : "Slot nieaktywny",
                             })
                           )
-                          .finally(() => usunPoleZMapy(p.id, "active"));
+                          .finally(() => usunPoleZMapy(s.id, "active"));
                       }}
                     />
                     <Switch.Control>
@@ -447,21 +457,21 @@ const Sloty = () => {
               </Table.Cell>
               <Table.Cell>
                 <Text>
-                  {p.from}:00 - {p.from + 1}:00
+                  {s.from}:00 - {s.from + 1}:00
                 </Text>
               </Table.Cell>
               <Table.Cell>
-                <Dialog.Root role="alertdialog" open={idDoUsuniecia === p.id}>
+                <Dialog.Root role="alertdialog" open={idDoUsuniecia === s.id}>
                   <Dialog.Trigger asChild>
-                    {!sprawdzCzyEdytowane(p.id, "usun") ? (
+                    {!sprawdzCzyEdytowane(s.id, "usun") ? (
                       <Button
                         size="md"
                         mr={2}
                         borderRadius={5}
                         disabled={
-                          sprawdzCzyEdytowane(p.id, "name") ||
-                          sprawdzCzyEdytowane(p.id, "active") ||
-                          sprawdzCzyEdytowane(p.id, "data")
+                          sprawdzCzyEdytowane(s.id, "name") ||
+                          sprawdzCzyEdytowane(s.id, "active") ||
+                          sprawdzCzyEdytowane(s.id, "data")
                         }
                         color={"red.600"}
                         bg={"white"}
@@ -469,8 +479,8 @@ const Sloty = () => {
                         transition="all 0.2s"
                         _active={{ transform: "scale(0.95)", bg: "red.600" }}
                         onClick={() => {
-                          dodajPoleDoMapy(p.id, "usun");
-                          setIdDoUsuniecia(p.id);
+                          dodajPoleDoMapy(s.id, "usun");
+                          setIdDoUsuniecia(s.id);
                         }}
                       >
                         <MdOutlineDeleteForever />
@@ -489,19 +499,19 @@ const Sloty = () => {
                         <Dialog.Body>
                           Czy jesteś pewien, że chcesz usunąć slot:{" "}
                           <Text fontWeight={"bold"} textAlign={"center"} mt={5}>
-                            {p.name}
+                            {s.name}
                             <br />
-                            {p.data.toLocaleDateString("pl-PL", {
+                            {s.data.toLocaleDateString("pl-PL", {
                               day: "2-digit",
                               month: "2-digit",
                               year: "numeric",
                             })}
                             <br />
-                            {p.from}:00 - {p.from + 1}:00
+                            {s.from}:00 - {s.from + 1}:00
                           </Text>
-                          {p.active && (
+                          {s.active && (
                             <Text textAlign="center" color="red" pt={5}>
-                              <b>{p.name}</b> jest oznaczony jako aktywny
+                              <b>{s.name}</b> jest oznaczony jako aktywny
                             </Text>
                           )}
                         </Dialog.Body>
@@ -511,7 +521,7 @@ const Sloty = () => {
                               variant="outline"
                               onClick={() => {
                                 resetIdDoUsuniecia();
-                                usunPoleZMapy(p.id, "usun");
+                                usunPoleZMapy(s.id, "usun");
                               }}
                             >
                               Nie
@@ -521,8 +531,8 @@ const Sloty = () => {
                             colorPalette="red"
                             onClick={() => {
                               resetIdDoUsuniecia();
-                              deleteSlot(p.id).finally(() =>
-                                usunPoleZMapy(p.id, "usun")
+                              deleteSlot(s.id).finally(() =>
+                                usunPoleZMapy(s.id, "usun")
                               );
                             }}
                           >
@@ -534,7 +544,7 @@ const Sloty = () => {
                             size="md"
                             onClick={() => {
                               resetIdDoUsuniecia();
-                              usunPoleZMapy(p.id, "usun");
+                              usunPoleZMapy(s.id, "usun");
                             }}
                           />
                         </Dialog.CloseTrigger>
