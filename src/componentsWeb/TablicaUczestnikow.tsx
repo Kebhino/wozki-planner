@@ -38,6 +38,7 @@ import { IoMdAdd } from "react-icons/io";
 import { v4 as uuidv4 } from "uuid";
 import SortableColumnHeader from "./SortowanieWKolumnie";
 import { useGlobalDialogStore } from "./stores/useGlobalDialogStore";
+import { useEdytowanePolaMapa } from "./stores/useEdytowanePolaMapa";
 const StyledSelect = chakra("select");
 const { ToastContainer, toast } = createStandaloneToast();
 
@@ -54,49 +55,8 @@ const TablicaUczestnikow = () => {
     direction: "asc",
   });
 
-  const [mapaEdytowanychPol, setMapeEdytowanychPol] = useState<
-    Map<string, string[]>
-  >(new Map());
-
-  const czyPoleJestZapisywane = (id: string, nazwaPola: string) => {
-    const zapisywanePola = mapaEdytowanychPol.get(id);
-
-    if (!zapisywanePola) return false;
-
-    const czyZawieraPole = zapisywanePola.includes(nazwaPola);
-
-    return czyZawieraPole; // da mi true albo false
-  };
-
-  const dodajPoleDoMapy = (id: string, nazwaPola: string) => {
-    setMapeEdytowanychPol((prev) => {
-      const nowaMapa = new Map(prev);
-
-      const aktualnePola = nowaMapa.get(id) || [];
-
-      if (!aktualnePola.includes(nazwaPola))
-        nowaMapa.set(id, [...aktualnePola, nazwaPola]);
-
-      return nowaMapa;
-    });
-  };
-
-  const usunPoleZMapy = (id: string, nazwaPola: string) => {
-    setMapeEdytowanychPol((prev) => {
-      const nowaMapa = new Map(prev);
-
-      const zaktualizowanaListaPol = (nowaMapa.get(id) || []).filter(
-        (pole) => pole !== nazwaPola
-      );
-
-      if (zaktualizowanaListaPol.length > 0) {
-        nowaMapa.set(id, zaktualizowanaListaPol);
-      } else nowaMapa.delete(id);
-      console.log(nowaMapa);
-
-      return nowaMapa;
-    });
-  };
+  const { dodajPoleDoMapy, sprawdzCzyEdytowane, usunPoleZMapy } =
+    useEdytowanePolaMapa();
 
   const position = useBreakpointValue({
     base: "top",
@@ -362,12 +322,12 @@ const TablicaUczestnikow = () => {
           {sortedParticipants.map((p) => (
             <Table.Row key={p.id}>
               <Table.Cell>
-                {!czyPoleJestZapisywane(p.id, "name") ? (
+                {!sprawdzCzyEdytowane(p.id, "name") ? (
                   <Editable.Root
                     defaultValue={p.name}
                     submitMode={"enter"}
-                    disabled={czyPoleJestZapisywane(p.id, "name")}
-                    opacity={czyPoleJestZapisywane(p.id, "name") ? 0.4 : 1}
+                    disabled={sprawdzCzyEdytowane(p.id, "name")}
+                    opacity={sprawdzCzyEdytowane(p.id, "name") ? 0.4 : 1}
                     onValueCommit={(val) => {
                       dodajPoleDoMapy(p.id, "name");
 
@@ -421,7 +381,7 @@ const TablicaUczestnikow = () => {
               </Table.Cell>
               <Table.Cell>
                 <HStack>
-                  {!czyPoleJestZapisywane(p.id, "status") ? (
+                  {!sprawdzCzyEdytowane(p.id, "status") ? (
                     <StyledSelect
                       defaultValue={p.status}
                       fontSize={{ base: "xs", md: "sm", lg: "sm" }}
@@ -456,7 +416,7 @@ const TablicaUczestnikow = () => {
                   ) : (
                     <Spinner ml={5} />
                   )}
-                  {!czyPoleJestZapisywane(p.id, "active") ? (
+                  {!sprawdzCzyEdytowane(p.id, "active") ? (
                     <Switch.Root
                       ml={5}
                       colorPalette={"green"}
@@ -490,15 +450,15 @@ const TablicaUczestnikow = () => {
               <Table.Cell>
                 <Dialog.Root role="alertdialog" open={idDoUsuniecia === p.id}>
                   <Dialog.Trigger asChild>
-                    {!czyPoleJestZapisywane(p.id, "usun") ? (
+                    {!sprawdzCzyEdytowane(p.id, "usun") ? (
                       <Button
                         size="md"
                         mr={2}
                         borderRadius={5}
                         disabled={
-                          czyPoleJestZapisywane(p.id, "name") ||
-                          czyPoleJestZapisywane(p.id, "active") ||
-                          czyPoleJestZapisywane(p.id, "status")
+                          sprawdzCzyEdytowane(p.id, "name") ||
+                          sprawdzCzyEdytowane(p.id, "active") ||
+                          sprawdzCzyEdytowane(p.id, "status")
                         }
                         color={"red.600"}
                         bg={"white"}

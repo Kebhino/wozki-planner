@@ -36,6 +36,7 @@ import { IoMdAdd } from "react-icons/io";
 import { v4 as uuidv4 } from "uuid";
 import SortableColumnHeader from "./SortowanieLokalizacja";
 import { useGlobalDialogStore } from "./stores/useGlobalDialogStore";
+import { useEdytowanePolaMapa } from "./stores/useEdytowanePolaMapa";
 
 const { ToastContainer, toast } = createStandaloneToast();
 
@@ -50,48 +51,8 @@ const Lokalizacje = () => {
     direction: "asc",
   });
 
-  const [mapaEdytowanychPol, setMapeEdytowanychPol] = useState<
-    Map<string, string[]>
-  >(new Map());
-
-  const czyPoleJestZapisywane = (id: string, nazwaPola: string) => {
-    const zapisywanePola = mapaEdytowanychPol.get(id);
-
-    if (!zapisywanePola) return false;
-
-    const czyZawieraPole = zapisywanePola.includes(nazwaPola);
-
-    return czyZawieraPole; // da mi true albo false
-  };
-
-  const dodajPoleDoMapy = (id: string, nazwaPola: string) => {
-    setMapeEdytowanychPol((prev) => {
-      const nowaMapa = new Map(prev);
-
-      const aktualnePola = nowaMapa.get(id) || [];
-
-      if (!aktualnePola.includes(nazwaPola))
-        nowaMapa.set(id, [...aktualnePola, nazwaPola]);
-
-      return nowaMapa;
-    });
-  };
-
-  const usunPoleZMapy = (id: string, nazwaPola: string) => {
-    setMapeEdytowanychPol((prev) => {
-      const nowaMapa = new Map(prev);
-
-      const zaktualizowanaListaPol = (nowaMapa.get(id) || []).filter(
-        (pole) => pole !== nazwaPola
-      );
-
-      if (zaktualizowanaListaPol.length > 0) {
-        nowaMapa.set(id, zaktualizowanaListaPol);
-      } else nowaMapa.delete(id);
-
-      return nowaMapa;
-    });
-  };
+  const { dodajPoleDoMapy, sprawdzCzyEdytowane, usunPoleZMapy } =
+    useEdytowanePolaMapa();
 
   const position = useBreakpointValue({
     base: "top",
@@ -331,12 +292,12 @@ const Lokalizacje = () => {
           {sortedParticipants.map((l) => (
             <Table.Row key={l.id}>
               <Table.Cell>
-                {!czyPoleJestZapisywane(l.id, "name") ? (
+                {!sprawdzCzyEdytowane(l.id, "name") ? (
                   <Editable.Root
                     defaultValue={l.name}
                     submitMode={"enter"}
-                    disabled={czyPoleJestZapisywane(l.id, "name")}
-                    opacity={czyPoleJestZapisywane(l.id, "name") ? 0.4 : 1}
+                    disabled={sprawdzCzyEdytowane(l.id, "name")}
+                    opacity={sprawdzCzyEdytowane(l.id, "name") ? 0.4 : 1}
                     onValueCommit={(val) => {
                       dodajPoleDoMapy(l.id, "name");
 
@@ -390,7 +351,7 @@ const Lokalizacje = () => {
               </Table.Cell>
               <Table.Cell>
                 <HStack>
-                  {!czyPoleJestZapisywane(l.id, "active") ? (
+                  {!sprawdzCzyEdytowane(l.id, "active") ? (
                     <Switch.Root
                       ml={5}
                       colorPalette={"green"}
@@ -424,15 +385,15 @@ const Lokalizacje = () => {
               <Table.Cell>
                 <Dialog.Root role="alertdialog" open={idDoUsuniecia === l.id}>
                   <Dialog.Trigger asChild>
-                    {!czyPoleJestZapisywane(l.id, "usun") ? (
+                    {!sprawdzCzyEdytowane(l.id, "usun") ? (
                       <Button
                         size="md"
                         mr={2}
                         borderRadius={5}
                         disabled={
-                          czyPoleJestZapisywane(l.id, "name") ||
-                          czyPoleJestZapisywane(l.id, "active") ||
-                          czyPoleJestZapisywane(l.id, "status")
+                          sprawdzCzyEdytowane(l.id, "name") ||
+                          sprawdzCzyEdytowane(l.id, "active") ||
+                          sprawdzCzyEdytowane(l.id, "status")
                         }
                         color={"red.600"}
                         bg={"white"}
