@@ -12,6 +12,7 @@ export const addLocalization = async (payload: AddLocationProps) => {
 };
 
 export const getLocalizations = async (signal?: AbortSignal) => {
+  await new Promise(resolve => setTimeout(resolve, 10000))
   const res = await fetch("https://gngp5xd4ol.execute-api.eu-central-1.amazonaws.com/lokalizacje", {signal});
   if (!res.ok) throw new Error("Błąd pobierania lokalizacji");
   const data = await res.json();

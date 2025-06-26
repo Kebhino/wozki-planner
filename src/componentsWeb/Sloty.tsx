@@ -356,7 +356,7 @@ const Sloty = () => {
               <Table.Cell>
                 {!sprawdzCzyEdytowane(p.id, "name") ? (
                   <StyledSelect
-                    value={p.name}
+                    value={p.name || ""}
                     fontSize={{ base: "xs", md: "sm", lg: "sm" }}
                     onChange={(e) => {
                       dodajPoleDoMapy(p.id, "name");
@@ -380,6 +380,19 @@ const Sloty = () => {
                         .finally(() => usunPoleZMapy(p.id, "name"));
                     }}
                   >
+                    <option
+                      value=""
+                      disabled={!lokalizacjeQuery.isLoading}
+                      hidden={false}
+                    >
+                      {lokalizacjeQuery.isLoading
+                        ? isMobile
+                          ? "Ładowanie..."
+                          : "Ładowanie lokalizacji..."
+                        : isMobile
+                        ? "Lokalizacja"
+                        : "Wybierz lokalizację"}
+                    </option>
                     {lokalizacjeData.map((lokalizacja) => (
                       <option key={lokalizacja.name} value={lokalizacja.name}>
                         {lokalizacja.name}
