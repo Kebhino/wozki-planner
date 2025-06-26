@@ -395,8 +395,7 @@ const Sloty = () => {
                     </option>
                     {[
                       ...lokalizacjeData,
-                      ...(s.name &&
-                      !lokalizacjeData.some(
+                      ...(!lokalizacjeData.some(
                         (l) => l.name === s.name && l.active
                       )
                         ? [{ id: uuidv4(), name: s.name, active: true }]
