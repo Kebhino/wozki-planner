@@ -416,8 +416,8 @@ const Sloty = () => {
                           .then(() =>
                             toast({
                               title: e.target.checked
-                                ? "Uczestnik aktywny"
-                                : "Uczestnik nieaktywny",
+                                ? "Slot aktywny"
+                                : "Slot nieaktywny",
                             })
                           )
                           .finally(() => usunPoleZMapy(p.id, "active"));
