@@ -82,8 +82,8 @@ const Sloty = () => {
         : valB.localeCompare(valA, "pl");
     }
     if (type === "data") {
-      const timeA = a.data.getTime(); // liczba milisekund
-      const timeB = b.data.getTime();
+      const timeA = a.data.getTime() + a.from * 3600000; // liczba milisekund
+      const timeB = b.data.getTime() + b.from * 3600000;
 
       return direction === "asc" ? timeA - timeB : timeB - timeA;
     }
