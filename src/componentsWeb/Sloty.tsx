@@ -1,8 +1,4 @@
-import type {
-  AddSlotProps,
-  Slot,
-  SortConfig,
-} from "@/componentsWeb/types/slots";
+import type { Slot, SortConfig } from "@/componentsWeb/types/slots";
 import { useLokalizacje } from "@/hooks/queries/useLokalizacje";
 import { useSloty } from "@/hooks/queries/useSloty";
 import {
@@ -31,8 +27,8 @@ import { MdOutlineDeleteForever } from "react-icons/md";
 import { v4 as uuidv4 } from "uuid";
 import { addSlot, deleteSlotFromDb, updateSlotInDb } from "./api/sloty";
 import SortableColumnHeader from "./SortowanieSloty";
-import { useGlobalDialogStore } from "./stores/useGlobalDialogStore";
 import { useEdytowanePolaMapa } from "./stores/useEdytowanePolaMapa";
+import { useGlobalDialogStore } from "./stores/useGlobalDialogStore";
 const StyledSelect = chakra("select");
 
 const { ToastContainer, toast } = createStandaloneToast();
@@ -46,7 +42,7 @@ const Sloty = () => {
     useGlobalDialogStore();
 
   const [sortConfig, setSortConfig] = useState<SortConfig>({
-    type: "surname",
+    type: "data",
     direction: "asc",
   });
 
@@ -78,15 +74,23 @@ const Sloty = () => {
     let valA: string | number;
     let valB: string | number;
 
-    if (type === "surname") {
+    if (type === "slot") {
       valA = a.name.split(" ").slice(-1)[0].toLowerCase();
       valB = b.name.split(" ").slice(-1)[0].toLowerCase();
       return direction === "asc"
         ? valA.localeCompare(valB, "pl")
         : valB.localeCompare(valA, "pl");
-    } else if (type === "data") {
+    }
+    if (type === "data") {
       const timeA = a.data.getTime(); // liczba milisekund
       const timeB = b.data.getTime();
+
+      return direction === "asc" ? timeA - timeB : timeB - timeA;
+    }
+
+    if (type === "godzina") {
+      const timeA = a.from;
+      const timeB = b.from;
 
       return direction === "asc" ? timeA - timeB : timeB - timeA;
     }
@@ -94,7 +98,7 @@ const Sloty = () => {
     return 0;
   });
 
-  const handleSortChange = (type: "surname" | "data") => {
+  const handleSortChange = (type: "slot" | "data" | "godzina") => {
     setSortConfig((prev) => {
       if (prev.type === type) {
         // Jeśli kliniemy w tą samą kolumne to zmieni się kierunek sortowania
@@ -113,9 +117,19 @@ const Sloty = () => {
   };
 
   const handleAddSlot = async () => {
-    if (typeof newSlot.name !== "string" || !newSlot.name.trim()) {
+    if (
+      typeof newSlot.name !== "string" ||
+      !newSlot.name.trim() ||
+      newSlot.from === 0
+    ) {
       toast({
-        title: "Wybierz Slot",
+        title:
+          (typeof newSlot.name !== "string" || !newSlot.name.trim()) &&
+          newSlot.from === 0
+            ? "Wybierz lokalizację i godzinę"
+            : typeof newSlot.name !== "string" || !newSlot.name.trim()
+            ? "Wybierz lokalizację"
+            : "Wybierz godzinę",
         status: "warning",
         duration: 3000,
         position,
@@ -414,7 +428,7 @@ const Sloty = () => {
             <Table.ColumnHeader fontWeight={"bold"}>
               <SortableColumnHeader
                 label="Sloty"
-                sortKey="surname"
+                sortKey="slot"
                 currentSort={sortConfig.type}
                 sortAsc={sortConfig.direction === "asc"}
                 onSortChange={handleSortChange}
@@ -431,7 +445,15 @@ const Sloty = () => {
             </Table.ColumnHeader>
 
             <Table.ColumnHeader>Aktywny</Table.ColumnHeader>
-            <Table.ColumnHeader>Godziny</Table.ColumnHeader>
+            <Table.ColumnHeader>
+              <SortableColumnHeader
+                label="Godziny"
+                sortKey="godzina"
+                currentSort={sortConfig.type}
+                sortAsc={sortConfig.direction === "asc"}
+                onSortChange={handleSortChange}
+              />
+            </Table.ColumnHeader>
             <Table.ColumnHeader>Akcje</Table.ColumnHeader>
           </Table.Row>
         </Table.Header>

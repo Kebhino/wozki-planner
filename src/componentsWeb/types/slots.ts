@@ -20,7 +20,7 @@ export interface Slot {
 
 
 export interface SortConfig {
-  type: "surname" | "data";
+  type: "slot" | "data" | "godzina"
   direction: "asc" | "desc";
 }
 

@@ -1,7 +1,7 @@
 import { HStack, Text, Icon } from "@chakra-ui/react";
 import { MdArrowDropUp, MdArrowDropDown } from "react-icons/md";
 
-type SortType = "surname" | "data";
+type SortType = "slot" | "data" | "godzina";
 
 interface SortableColumnHeaderProps {
   label: string;
