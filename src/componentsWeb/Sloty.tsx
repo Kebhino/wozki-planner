@@ -75,8 +75,8 @@ const Sloty = () => {
     let valB: string | number;
 
     if (type === "slot") {
-      valA = a.name.split(" ").slice(-1)[0].toLowerCase();
-      valB = b.name.split(" ").slice(-1)[0].toLowerCase();
+      valA = a.name;
+      valB = b.name;
       return direction === "asc"
         ? valA.localeCompare(valB, "pl")
         : valB.localeCompare(valA, "pl");
