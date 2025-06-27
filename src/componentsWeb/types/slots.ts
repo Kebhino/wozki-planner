@@ -13,6 +13,8 @@ export interface Slot {
   active: boolean
   data: Date
   from: number
+  to?: number
+  suggestedTo?: number
 }
 
 

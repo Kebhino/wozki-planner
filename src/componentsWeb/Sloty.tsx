@@ -23,7 +23,7 @@ import type { ToastPosition } from "@chakra-ui/toast";
 import { createStandaloneToast } from "@chakra-ui/toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { pl } from "date-fns/locale";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { IoMdAdd } from "react-icons/io";
@@ -37,8 +37,8 @@ const StyledSelect = chakra("select");
 
 const { ToastContainer, toast } = createStandaloneToast();
 registerLocale("pl", pl);
-const dostepneGodziny = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
-
+const dostepneGodzinyOd = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
+const dostepneGodzinyDo = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
 const Sloty = () => {
   const queryClient = useQueryClient();
   const [uzytkownikDodawany, setUzytkownikDodawany] = useState(false);
@@ -62,6 +62,8 @@ const Sloty = () => {
     data: new Date(),
     active: true,
     from: 0,
+    to: undefined,
+    suggestedTo: undefined,
   });
 
   const lokalizacjeQuery = useLokalizacje();
@@ -123,32 +125,57 @@ const Sloty = () => {
       return;
     }
 
-    const payload: AddSlotProps = {
-      id: uuidv4(),
-      active: newSlot.active,
-      name: newSlot.name,
-      data: newSlot.data.toLocaleDateString(),
-      from: newSlot.from,
+    const ileSlotowDodac = () => {
+      if (newSlot.to) return newSlot.to - newSlot.from;
+      return 1;
     };
 
     try {
       setUzytkownikDodawany(true);
-      await addSlot(payload);
+      for (let i = 0; i < ileSlotowDodac(); i++) {
+        await addSlot({
+          id: uuidv4(),
+          active: newSlot.active,
+          name: newSlot.name,
+          data: newSlot.data.toLocaleDateString(),
+          from: newSlot.from + i,
+        });
+      }
 
       queryClient.invalidateQueries({ queryKey: ["sloty"] });
-      setNewSlot({ name: "", data: new Date(), active: true, from: 0 });
+      setNewSlot({
+        name: "",
+        data: new Date(),
+        active: true,
+        from: 0,
+        to: undefined,
+        suggestedTo: undefined,
+      });
       setUzytkownikDodawany(false);
 
       toast({
-        title: "Dodano Slot",
-        description: `${newSlot.name} w dniu ${newSlot.data.toLocaleDateString(
-          "pl-PL",
-          {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          }
-        )} godzina: ${newSlot.from}`,
+        title:
+          ileSlotowDodac() === 1
+            ? "Dodano Slot"
+            : `Dodano ${ileSlotowDodac()} slotów`,
+        description:
+          ileSlotowDodac() === 1
+            ? `${newSlot.name} w dniu ${newSlot.data.toLocaleDateString(
+                "pl-PL",
+                {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                }
+              )} godzina: ${newSlot.from}`
+            : `${newSlot.name} w dniu ${newSlot.data.toLocaleDateString(
+                "pl-PL",
+                {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                }
+              )} od godziny: ${newSlot.from} do ${newSlot.to}`,
         status: "success",
         duration: 4000,
         isClosable: true,
@@ -212,7 +239,14 @@ const Sloty = () => {
   };
 
   const isMobile = window.innerWidth < 768; // zmienna pomocnicza zeby ogarnac responsywnosc selektorów
-
+  useEffect(() => {
+    console.log(
+      "Nowa godzina DO:",
+      newSlot.to,
+      "Suegrowana do",
+      newSlot.suggestedTo
+    );
+  }, [newSlot]);
   return (
     <Box pt={4}>
       {slotsQuery.isLoading && <p>Ładowanie slotów...</p>}
@@ -282,9 +316,13 @@ const Sloty = () => {
           borderRadius={5}
           px={5}
           onChange={(e) => {
+            const wybranaGodzina = parseInt(e.target.value);
+
             setNewSlot((prev) => ({
               ...prev,
-              from: parseInt(e.target.value),
+              from: wybranaGodzina,
+              to: undefined,
+              suggestedTo: wybranaGodzina + 1,
             }));
           }}
         >
@@ -294,11 +332,59 @@ const Sloty = () => {
                 ? "Ładowanie..."
                 : "Ładowanie godzin"
               : isMobile
-              ? "Godzina"
-              : "Wybierz godzinę"}
+              ? "Od"
+              : "Od godziny"}
           </option>
 
-          {dostepneGodziny.map((godzina, index) => (
+          {dostepneGodzinyOd.map((godzina, index) => (
+            <option key={index} value={godzina}>
+              {godzina}
+            </option>
+          ))}
+        </StyledSelect>
+        <StyledSelect
+          value={
+            typeof newSlot.to === "number"
+              ? newSlot.to
+              : newSlot.suggestedTo ?? ""
+          }
+          bg="white"
+          color="black"
+          fontSize={{ base: 12, md: 14, lg: 16 }}
+          height={10}
+          textAlign={"center"}
+          borderRadius={5}
+          px={5}
+          onChange={(e) => {
+            const wybraneDo = parseInt(e.target.value);
+            if (wybraneDo <= newSlot.from) {
+              toast({
+                title: "Błędny zakres godzin",
+                description: "Godzina 'do' musi być późniejsza niż 'od'.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+              });
+              return;
+            }
+            setNewSlot((prev) => ({
+              ...prev,
+              to: wybraneDo,
+              suggestedTo: undefined,
+            }));
+          }}
+        >
+          <option value="" disabled hidden>
+            {slotsQuery.isLoading
+              ? isMobile
+                ? "Ładowanie..."
+                : "Ładowanie godzin"
+              : isMobile
+              ? "Do"
+              : "Do godziny"}
+          </option>
+
+          {dostepneGodzinyDo.map((godzina, index) => (
             <option key={index} value={godzina}>
               {godzina}
             </option>
