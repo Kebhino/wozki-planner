@@ -430,7 +430,7 @@ const Sloty = () => {
           <Table.Row>
             <Table.ColumnHeader fontWeight={"bold"}>
               <SortableColumnHeader
-                label="Sloty"
+                label="Lokalizacja"
                 sortKey="slot"
                 currentSort={sortConfig.type}
                 sortAsc={sortConfig.direction === "asc"}
@@ -447,7 +447,6 @@ const Sloty = () => {
               />
             </Table.ColumnHeader>
 
-            <Table.ColumnHeader>Aktywny</Table.ColumnHeader>
             <Table.ColumnHeader>
               <SortableColumnHeader
                 label="Godziny"
@@ -457,6 +456,7 @@ const Sloty = () => {
                 onSortChange={handleSortChange}
               />
             </Table.ColumnHeader>
+            <Table.ColumnHeader>Aktywny</Table.ColumnHeader>
             <Table.ColumnHeader>Akcje</Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
@@ -535,6 +535,11 @@ const Sloty = () => {
                 </HStack>
               </Table.Cell>
               <Table.Cell>
+                <Text>
+                  {s.from}:00 - {s.from + 1}:00
+                </Text>
+              </Table.Cell>
+              <Table.Cell>
                 {!sprawdzCzyEdytowane(s.id, "active") ? (
                   <Switch.Root
                     ml={5}
@@ -565,11 +570,7 @@ const Sloty = () => {
                   <Spinner ml={7} />
                 )}
               </Table.Cell>
-              <Table.Cell>
-                <Text>
-                  {s.from}:00 - {s.from + 1}:00
-                </Text>
-              </Table.Cell>
+
               <Table.Cell>
                 <Dialog.Root role="alertdialog" open={idDoUsuniecia === s.id}>
                   <Dialog.Trigger asChild>
