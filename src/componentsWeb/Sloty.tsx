@@ -146,7 +146,10 @@ const Sloty = () => {
 
     try {
       setUzytkownikDodawany(true);
-      for (let i = 0; i < ileSlotowDodac(); i++) {
+
+      let iloscPetli = ileSlotowDodac();
+
+      for (let i = 0; i < iloscPetli; i++) {
         await addSlot({
           id: uuidv4(),
           active: newSlot.active,
