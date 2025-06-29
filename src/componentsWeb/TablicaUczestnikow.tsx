@@ -39,6 +39,7 @@ import { v4 as uuidv4 } from "uuid";
 import SortableColumnHeader from "./SortowanieWKolumnie";
 import { useGlobalDialogStore } from "./stores/useGlobalDialogStore";
 import { useEdytowanePolaMapa } from "./stores/useEdytowanePolaMapa";
+import { Tooltip } from "@/components/ui/tooltip";
 const StyledSelect = chakra("select");
 const { ToastContainer, toast } = createStandaloneToast();
 
@@ -288,15 +289,39 @@ const TablicaUczestnikow = () => {
           borderRadius={10}
           _hover={{ bg: "green.400", color: "white" }}
         >
-          {uzytkownikDodawany ? <Spinner /> : <IoMdAdd />}
+          {uzytkownikDodawany ? (
+            <Spinner size="sm" color="gray.500" />
+          ) : (
+            <IoMdAdd />
+          )}
         </Button>
       </HStack>
 
       {/* Tabela */}
-      <Table.Root width="100%" mt={3} color={"black"} interactive>
+      <Table.Root
+        width="100%"
+        mt={5}
+        color="gray.800"
+        background="white"
+        boxShadow="md"
+        borderRadius="md"
+        overflow="hidden"
+        border="1px solid"
+        borderColor="gray.200"
+        interactive
+      >
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeader fontWeight={"bold"}>
+            <Table.ColumnHeader
+              bg="gray.100"
+              fontWeight="semibold"
+              fontSize="sm"
+              letterSpacing="wide"
+              textTransform="uppercase"
+              color="gray.600"
+              py={3}
+              px={4}
+            >
               <SortableColumnHeader
                 label="Imię i nazwisko"
                 sortKey="surname"
@@ -305,7 +330,16 @@ const TablicaUczestnikow = () => {
                 onSortChange={handleSortChange}
               />
             </Table.ColumnHeader>
-            <Table.ColumnHeader>
+            <Table.ColumnHeader
+              bg="gray.100"
+              fontWeight="semibold"
+              fontSize="sm"
+              letterSpacing="wide"
+              textTransform="uppercase"
+              color="gray.600"
+              py={3}
+              px={4}
+            >
               <SortableColumnHeader
                 label="Status"
                 sortKey="status"
@@ -314,7 +348,18 @@ const TablicaUczestnikow = () => {
                 onSortChange={handleSortChange}
               />
             </Table.ColumnHeader>
-            <Table.ColumnHeader>Akcje</Table.ColumnHeader>
+            <Table.ColumnHeader
+              bg="gray.100"
+              fontWeight="semibold"
+              fontSize="sm"
+              letterSpacing="wide"
+              textTransform="uppercase"
+              color="gray.600"
+              py={3}
+              px={4}
+            >
+              Akcje
+            </Table.ColumnHeader>
           </Table.Row>
         </Table.Header>
 
@@ -341,16 +386,24 @@ const TablicaUczestnikow = () => {
                       <Editable.Input />
                       <Editable.Control>
                         <Editable.EditTrigger asChild>
-                          <IconButton
-                            variant="ghost"
-                            size="xs"
-                            borderRadius={"full"}
-                            _hover={{
-                              bg: "green.500",
-                            }}
+                          <Tooltip
+                            content="Kliknij, aby edytować"
+                            showArrow
+                            contentProps={{ css: { "--tooltip-bg": "gray" } }}
+                            openDelay={300}
+                            closeDelay={100}
                           >
-                            <LuPencilLine />
-                          </IconButton>
+                            <IconButton
+                              variant="ghost"
+                              size="xs"
+                              borderRadius={"full"}
+                              _hover={{
+                                bg: "green.500",
+                              }}
+                            >
+                              <LuPencilLine />
+                            </IconButton>
+                          </Tooltip>
                         </Editable.EditTrigger>
                         <Editable.CancelTrigger asChild>
                           <IconButton
@@ -376,7 +429,7 @@ const TablicaUczestnikow = () => {
                     </Stack>
                   </Editable.Root>
                 ) : (
-                  <Spinner />
+                  <Spinner size="sm" color="gray.500" />
                 )}
               </Table.Cell>
               <Table.Cell>
@@ -414,7 +467,7 @@ const TablicaUczestnikow = () => {
                       ))}
                     </StyledSelect>
                   ) : (
-                    <Spinner ml={5} />
+                    <Spinner ml={5} size="sm" color="gray.500" />
                   )}
                   {!sprawdzCzyEdytowane(p.id, "active") ? (
                     <Switch.Root
@@ -443,7 +496,7 @@ const TablicaUczestnikow = () => {
                       <Switch.Label />
                     </Switch.Root>
                   ) : (
-                    <Spinner ml={7} />
+                    <Spinner ml={7} size="md" color="gray.500" />
                   )}
                 </HStack>
               </Table.Cell>
@@ -473,7 +526,7 @@ const TablicaUczestnikow = () => {
                         <MdOutlineDeleteForever />
                       </Button>
                     ) : (
-                      <Spinner mr={6} size={"md"} />
+                      <Spinner mr={6} size={"md"} color="gray.500" />
                     )}
                   </Dialog.Trigger>
                   <Portal>
