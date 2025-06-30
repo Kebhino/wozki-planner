@@ -2,7 +2,6 @@
 
 export interface AddSlotProps {
   id: string;
-  
   active: boolean
   data: string;
   from: number
