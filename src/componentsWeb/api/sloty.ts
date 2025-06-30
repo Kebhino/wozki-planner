@@ -16,14 +16,13 @@ export const getSlots = async (signal?: AbortSignal) => {
   const res = await fetch("https://gngp5xd4ol.execute-api.eu-central-1.amazonaws.com/sloty", {signal});
   if (!res.ok) throw new Error("Błąd pobierania slotów");
   const data = await res.json();
+  console.log("Sloty z api",data);
+  
    return data.items.map((item: any) => {
     
 
-    return {
-      id: item.id,
-      name: item.name,
-      active: item.active,
-      from: Number(item.from),
+    return { ...item,
+      
       data: item.data ? new Date(item.data) : null,
     };
   });

@@ -2,10 +2,11 @@
 
 export interface AddSlotProps {
   id: string;
-  name: string;
+  
   active: boolean
   data: string;
   from: number
+  lokalizacjaId: string
 }
 export interface Slot {
   id: string;

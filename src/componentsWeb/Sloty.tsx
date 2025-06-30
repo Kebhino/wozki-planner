@@ -66,10 +66,11 @@ const Sloty = () => {
   const lokalizacjeQuery = useLokalizacje();
   const lokalizacjeData = lokalizacjeQuery.data || [];
 
-  const slotsQuery = useSloty();
-  const slots = slotsQuery.data || [];
+  const slotyQuery = useSloty();
+  const slotyData = slotyQuery.data || [];
+  console.log("To są sloty przed sortowaniem", slotyData);
 
-  const sortedParticipants = [...slots].sort((a, b) => {
+  const sortedParticipants = [...slotyData].sort((a, b) => {
     const { type, direction } = sortConfig;
 
     let valA: string | number;
@@ -155,9 +156,10 @@ const Sloty = () => {
         await addSlot({
           id: uuidv4(),
           active: newSlot.active,
-          name: newSlot.name,
+
           data: newSlot.data.toLocaleDateString(),
           from: newSlot.from + i,
+          lokalizacjaId: newSlot.lokalizacjaId,
         });
       }
 
@@ -269,9 +271,9 @@ const Sloty = () => {
   }, [newSlot]);
   return (
     <Box pt={4}>
-      {slotsQuery.isLoading && <p>Ładowanie slotów...</p>}
-      {slotsQuery.error && (
-        <p>Błąd wczytywania danych: {(slotsQuery.error as Error).message}</p>
+      {slotyQuery.isLoading && <p>Ładowanie slotów...</p>}
+      {slotyQuery.error && (
+        <p>Błąd wczytywania danych: {(slotyQuery.error as Error).message}</p>
       )}
       <ToastContainer />
       {/* Formularz */}
@@ -306,7 +308,7 @@ const Sloty = () => {
           {lokalizacjeData
             .filter((lokalizacja) => lokalizacja.active)
             .map((lokalizacja) => (
-              <option key={lokalizacja.id} value={lokalizacja.id}>
+              <option key={uuidv4()} value={lokalizacja.id}>
                 {lokalizacja.name}
               </option>
             ))}
@@ -325,7 +327,6 @@ const Sloty = () => {
           }}
           className="custom-datepicker"
         />
-        📅
         <StyledSelect
           value={newSlot.from === 0 ? "" : newSlot.from}
           bg="white"
@@ -347,7 +348,7 @@ const Sloty = () => {
           }}
         >
           <option value="" disabled hidden>
-            {slotsQuery.isLoading
+            {slotyQuery.isLoading
               ? isMobile
                 ? "Ładowanie..."
                 : "Ładowanie godzin"
@@ -395,7 +396,7 @@ const Sloty = () => {
           }}
         >
           <option value="" disabled hidden>
-            {slotsQuery.isLoading
+            {slotyQuery.isLoading
               ? isMobile
                 ? "Ładowanie..."
                 : "Ładowanie godzin"
@@ -410,7 +411,7 @@ const Sloty = () => {
             </option>
           ))}
         </StyledSelect>
-        ⏰
+
         <Button
           colorScheme="green"
           disabled={uzytkownikDodawany}
@@ -471,11 +472,11 @@ const Sloty = () => {
               <Table.Cell>
                 {!sprawdzCzyEdytowane(s.id, "name") ? (
                   <StyledSelect
-                    value={s.name || ""}
+                    value={s.lokalizacjaId}
                     fontSize={{ base: "xs", md: "sm", lg: "sm" }}
                     onChange={(e) => {
                       dodajPoleDoMapy(s.id, "name");
-                      updateSlot(s.id, "name", e.target.value)
+                      updateSlot(s.id, "lokalizacjaId", e.target.value)
                         .then(() =>
                           toast({
                             description: (
@@ -508,17 +509,24 @@ const Sloty = () => {
                         ? "Lokalizacja"
                         : "Wybierz lokalizację"}
                     </option>
+
                     {[
                       ...lokalizacjeData,
                       ...(!lokalizacjeData.some(
-                        (l) => l.name === s.name && l.active
+                        (l) => l.id === s.lokalizacjaId && l.active
                       )
-                        ? [{ id: uuidv4(), name: s.name, active: true }]
+                        ? [
+                            {
+                              id: s.lokalizacjaId,
+                              name: "Usnięta/Nieaktywna",
+                              active: true,
+                            },
+                          ]
                         : []),
                     ]
                       .filter((lokalizacja) => lokalizacja.active)
                       .map((lokalizacja) => (
-                        <option key={lokalizacja.name} value={lokalizacja.name}>
+                        <option key={lokalizacja.id} value={lokalizacja.id}>
                           {lokalizacja.name}
                         </option>
                       ))}
