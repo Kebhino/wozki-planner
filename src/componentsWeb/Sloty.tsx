@@ -537,28 +537,40 @@ const Sloty = () => {
               </Table.Cell>
 
               {/* DATA */}
+
               <Table.Cell whiteSpace="normal">
-                <Box maxW="100%" overflowX="auto">
-                  <DatePicker
-                    selected={s.data}
-                    locale="pl"
-                    dateFormat="dd.MM.yyyy"
-                    onChange={(date) => {
-                      if (date) {
-                        updateSlot(
-                          s.id,
-                          "data",
-                          date.toLocaleDateString("pl-PL", {
-                            day: "2-digit",
-                            month: "2-digit",
-                            year: "numeric",
-                          })
-                        );
-                      }
-                    }}
-                    className="custom-datepicker-tablica"
-                  />
-                </Box>
+                {!sprawdzCzyEdytowane(s.id, "data") ? (
+                  <Box maxW="100%" overflowX="auto">
+                    <DatePicker
+                      selected={s.data}
+                      locale="pl"
+                      dateFormat="dd.MM.yyyy"
+                      onChange={(date) => {
+                        dodajPoleDoMapy(s.id, "data");
+                        if (date) {
+                          updateSlot(
+                            s.id,
+                            "data",
+                            date.toLocaleDateString("pl-PL", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                            })
+                          )
+                            .then(() =>
+                              toast({
+                                title: "Zmieniono date",
+                              })
+                            )
+                            .finally(() => usunPoleZMapy(s.id, "data"));
+                        }
+                      }}
+                      className="custom-datepicker-tablica"
+                    />
+                  </Box>
+                ) : (
+                  <Spinner />
+                )}
               </Table.Cell>
 
               {/* GODZINA */}
