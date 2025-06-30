@@ -469,74 +469,76 @@ const Sloty = () => {
         <Table.Body>
           {sortedParticipants.map((s) => (
             <Table.Row key={s.id}>
-              <Table.Cell>
-                {!sprawdzCzyEdytowane(s.id, "name") ? (
-                  <StyledSelect
-                    value={s.lokalizacjaId}
-                    fontSize={{ base: "xs", md: "sm", lg: "sm" }}
-                    onChange={(e) => {
-                      dodajPoleDoMapy(s.id, "name");
-                      updateSlot(s.id, "lokalizacjaId", e.target.value)
-                        .then(() =>
-                          toast({
-                            description: (
-                              <Text>
-                                Zmieniono lokalizacje na:{" "}
-                                <Text
-                                  as="span"
-                                  fontWeight="bold"
-                                  display="inline"
-                                >
-                                  {e.target.value}
+              {/* LOKALIZACJA */}
+              <Table.Cell whiteSpace="normal">
+                <Box maxW="100%" overflowX="auto">
+                  {!sprawdzCzyEdytowane(s.id, "name") ? (
+                    <StyledSelect
+                      value={s.lokalizacjaId}
+                      w="100%"
+                      fontSize={{ base: "xs", md: "sm", lg: "sm" }}
+                      onChange={(e) => {
+                        dodajPoleDoMapy(s.id, "name");
+                        updateSlot(s.id, "lokalizacjaId", e.target.value)
+                          .then(() =>
+                            toast({
+                              description: (
+                                <Text>
+                                  Zmieniono lokalizację na:{" "}
+                                  <Text
+                                    as="span"
+                                    fontWeight="bold"
+                                    display="inline"
+                                  >
+                                    {e.target.value}
+                                  </Text>
                                 </Text>
-                              </Text>
-                            ),
-                          })
-                        )
-                        .finally(() => usunPoleZMapy(s.id, "name"));
-                    }}
-                  >
-                    <option
-                      value=""
-                      disabled={!lokalizacjeQuery.isLoading}
-                      hidden={false}
+                              ),
+                            })
+                          )
+                          .finally(() => usunPoleZMapy(s.id, "name"));
+                      }}
                     >
-                      {lokalizacjeQuery.isLoading
-                        ? isMobile
-                          ? "Ładowanie..."
-                          : "Ładowanie lokalizacji..."
-                        : isMobile
-                        ? "Lokalizacja"
-                        : "Wybierz lokalizację"}
-                    </option>
+                      <option value="" disabled={!lokalizacjeQuery.isLoading}>
+                        {lokalizacjeQuery.isLoading
+                          ? isMobile
+                            ? "Ładowanie..."
+                            : "Ładowanie lokalizacji..."
+                          : isMobile
+                          ? "Lokalizacja"
+                          : "Wybierz lokalizację"}
+                      </option>
 
-                    {[
-                      ...lokalizacjeData,
-                      ...(!lokalizacjeData.some(
-                        (l) => l.id === s.lokalizacjaId && l.active
-                      )
-                        ? [
-                            {
-                              id: s.lokalizacjaId,
-                              name: "Usnięta/Nieaktywna",
-                              active: true,
-                            },
-                          ]
-                        : []),
-                    ]
-                      .filter((lokalizacja) => lokalizacja.active)
-                      .map((lokalizacja) => (
-                        <option key={lokalizacja.id} value={lokalizacja.id}>
-                          {lokalizacja.name}
-                        </option>
-                      ))}
-                  </StyledSelect>
-                ) : (
-                  <Spinner ml={5} />
-                )}
+                      {[
+                        ...lokalizacjeData,
+                        ...(!lokalizacjeData.some(
+                          (l) => l.id === s.lokalizacjaId && l.active
+                        )
+                          ? [
+                              {
+                                id: s.lokalizacjaId,
+                                name: "Usunięta/Nieaktywna",
+                                active: true,
+                              },
+                            ]
+                          : []),
+                      ]
+                        .filter((lokalizacja) => lokalizacja.active)
+                        .map((lokalizacja) => (
+                          <option key={lokalizacja.id} value={lokalizacja.id}>
+                            {lokalizacja.name}
+                          </option>
+                        ))}
+                    </StyledSelect>
+                  ) : (
+                    <Spinner ml={5} />
+                  )}
+                </Box>
               </Table.Cell>
-              <Table.Cell>
-                <HStack>
+
+              {/* DATA */}
+              <Table.Cell whiteSpace="normal">
+                <Box maxW="100%" overflowX="auto">
                   <DatePicker
                     selected={s.data}
                     locale="pl"
@@ -556,16 +558,20 @@ const Sloty = () => {
                     }}
                     className="custom-datepicker-tablica"
                   />
-                </HStack>
+                </Box>
               </Table.Cell>
-              <Table.Cell textAlign={"center"}>
+
+              {/* GODZINA */}
+              <Table.Cell textAlign="center">
                 <Text>{s.from}</Text>
               </Table.Cell>
+
+              {/* SWITCH */}
               <Table.Cell>
                 {!sprawdzCzyEdytowane(s.id, "active") ? (
                   <Switch.Root
-                    ml={5}
-                    colorPalette={"green"}
+                    ml={2}
+                    colorPalette="green"
                     checked={s.active}
                     size={{ base: "xs", md: "sm", lg: "md" }}
                   >
@@ -589,102 +595,105 @@ const Sloty = () => {
                     <Switch.Label />
                   </Switch.Root>
                 ) : (
-                  <Spinner ml={7} />
+                  <Spinner ml={4} />
                 )}
               </Table.Cell>
 
-              <Table.Cell>
-                <Dialog.Root role="alertdialog" open={idDoUsuniecia === s.id}>
-                  <Dialog.Trigger asChild>
-                    {!sprawdzCzyEdytowane(s.id, "usun") ? (
-                      <Button
-                        size="md"
-                        mr={2}
-                        borderRadius={5}
-                        disabled={
-                          sprawdzCzyEdytowane(s.id, "name") ||
-                          sprawdzCzyEdytowane(s.id, "active") ||
-                          sprawdzCzyEdytowane(s.id, "data")
-                        }
-                        color={"red.600"}
-                        bg={"white"}
-                        _hover={{ bg: "red", color: "white" }}
-                        transition="all 0.2s"
-                        _active={{ transform: "scale(0.95)", bg: "red.600" }}
-                        onClick={() => {
-                          dodajPoleDoMapy(s.id, "usun");
-                          setIdDoUsuniecia(s.id);
-                        }}
-                      >
-                        <MdOutlineDeleteForever />
-                      </Button>
-                    ) : (
-                      <Spinner mr={6} size={"md"} />
-                    )}
-                  </Dialog.Trigger>
-                  <Portal>
-                    <Dialog.Backdrop />
-                    <Dialog.Positioner>
-                      <Dialog.Content>
-                        <Dialog.Header>
-                          <Dialog.Title>Jesteś pewien?</Dialog.Title>
-                        </Dialog.Header>
-                        <Dialog.Body>
-                          Czy jesteś pewien, że chcesz usunąć slot:{" "}
-                          <Text fontWeight={"bold"} textAlign={"center"} mt={5}>
-                            {s.name}
-                            <br />
-                            {s.data.toLocaleDateString("pl-PL", {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "numeric",
-                            })}
-                            <br />
-                            {s.from}:00 - {s.from + 1}:00
-                          </Text>
-                          {s.active && (
-                            <Text textAlign="center" color="red" pt={5}>
-                              <b>{s.name}</b> jest oznaczony jako aktywny
+              {/* DELETE */}
+              <Table.Cell whiteSpace="normal">
+                <Box maxW="100%" overflowX="auto">
+                  <Dialog.Root role="alertdialog" open={idDoUsuniecia === s.id}>
+                    <Dialog.Trigger asChild>
+                      {!sprawdzCzyEdytowane(s.id, "usun") ? (
+                        <Button
+                          size="sm"
+                          mr={2}
+                          borderRadius={5}
+                          disabled={
+                            sprawdzCzyEdytowane(s.id, "name") ||
+                            sprawdzCzyEdytowane(s.id, "active") ||
+                            sprawdzCzyEdytowane(s.id, "data")
+                          }
+                          color="red.600"
+                          bg="white"
+                          _hover={{ bg: "red", color: "white" }}
+                          transition="all 0.2s"
+                          _active={{ transform: "scale(0.95)", bg: "red.600" }}
+                          onClick={() => {
+                            dodajPoleDoMapy(s.id, "usun");
+                            setIdDoUsuniecia(s.id);
+                          }}
+                        >
+                          <MdOutlineDeleteForever />
+                        </Button>
+                      ) : (
+                        <Spinner mr={6} size="md" />
+                      )}
+                    </Dialog.Trigger>
+
+                    <Portal>
+                      <Dialog.Backdrop />
+                      <Dialog.Positioner>
+                        <Dialog.Content>
+                          <Dialog.Header>
+                            <Dialog.Title>Jesteś pewien?</Dialog.Title>
+                          </Dialog.Header>
+                          <Dialog.Body>
+                            <Text fontWeight="bold" textAlign="center" mt={5}>
+                              {s.name}
+                              <br />
+                              {s.data.toLocaleDateString("pl-PL", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                              })}
+                              <br />
+                              {s.from}:00 - {s.from + 1}:00
                             </Text>
-                          )}
-                        </Dialog.Body>
-                        <Dialog.Footer>
-                          <Dialog.ActionTrigger asChild>
+                            {s.active && (
+                              <Text textAlign="center" color="red" pt={5}>
+                                <b>{s.name}</b> jest oznaczony jako aktywny
+                              </Text>
+                            )}
+                          </Dialog.Body>
+                          <Dialog.Footer>
+                            <Dialog.ActionTrigger asChild>
+                              <Button
+                                variant="outline"
+                                onClick={() => {
+                                  resetIdDoUsuniecia();
+                                  usunPoleZMapy(s.id, "usun");
+                                }}
+                              >
+                                Nie
+                              </Button>
+                            </Dialog.ActionTrigger>
                             <Button
-                              variant="outline"
+                              colorPalette="red"
+                              onClick={() => {
+                                resetIdDoUsuniecia();
+                                deleteSlot(s.id).finally(() =>
+                                  usunPoleZMapy(s.id, "usun")
+                                );
+                              }}
+                            >
+                              Tak
+                            </Button>
+                          </Dialog.Footer>
+                          <Dialog.CloseTrigger asChild>
+                            <CloseButton
+                              size="md"
                               onClick={() => {
                                 resetIdDoUsuniecia();
                                 usunPoleZMapy(s.id, "usun");
                               }}
-                            >
-                              Nie
-                            </Button>
-                          </Dialog.ActionTrigger>
-                          <Button
-                            colorPalette="red"
-                            onClick={() => {
-                              resetIdDoUsuniecia();
-                              deleteSlot(s.id).finally(() =>
-                                usunPoleZMapy(s.id, "usun")
-                              );
-                            }}
-                          >
-                            Tak
-                          </Button>
-                        </Dialog.Footer>
-                        <Dialog.CloseTrigger asChild>
-                          <CloseButton
-                            size="md"
-                            onClick={() => {
-                              resetIdDoUsuniecia();
-                              usunPoleZMapy(s.id, "usun");
-                            }}
-                          />
-                        </Dialog.CloseTrigger>
-                      </Dialog.Content>
-                    </Dialog.Positioner>
-                  </Portal>
-                </Dialog.Root>
+                            />
+                          </Dialog.CloseTrigger>
+                        </Dialog.Content>
+                      </Dialog.Positioner>
+                    </Portal>
+                  </Dialog.Root>
+                </Box>
               </Table.Cell>
             </Table.Row>
           ))}

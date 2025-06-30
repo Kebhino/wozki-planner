@@ -31,6 +31,8 @@ body {
 .custom-datepicker-tablica {
   border: none;
   outline: none;
+   width: 100%;
+  max-width: 100%;
   box-shadow: none;
   background-color: transparent; /* opcjonalnie */
 }
