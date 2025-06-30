@@ -449,8 +449,9 @@ const Sloty = () => {
 
             <Table.ColumnHeader>
               <SortableColumnHeader
-                label="Godziny"
+                label="Godzina"
                 sortKey="godzina"
+                justifyContent="center"
                 currentSort={sortConfig.type}
                 sortAsc={sortConfig.direction === "asc"}
                 onSortChange={handleSortChange}
@@ -534,10 +535,8 @@ const Sloty = () => {
                   </Text>
                 </HStack>
               </Table.Cell>
-              <Table.Cell>
-                <Text>
-                  {s.from}:00 - {s.from + 1}:00
-                </Text>
+              <Table.Cell textAlign={"center"}>
+                <Text>{s.from}</Text>
               </Table.Cell>
               <Table.Cell>
                 {!sprawdzCzyEdytowane(s.id, "active") ? (

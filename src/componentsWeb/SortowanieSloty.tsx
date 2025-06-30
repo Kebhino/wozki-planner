@@ -9,6 +9,7 @@ interface SortableColumnHeaderProps {
   currentSort: SortType;
   sortAsc: boolean;
   onSortChange: (key: SortType) => void;
+  justifyContent?: "flex-start" | "center" | "flex-end";
 }
 
 const SortableColumnHeader = ({
@@ -17,6 +18,7 @@ const SortableColumnHeader = ({
   currentSort,
   sortAsc,
   onSortChange,
+  justifyContent = "flex-start",
 }: SortableColumnHeaderProps) => {
   const isActive = currentSort === sortKey;
   const icon = isActive
@@ -30,6 +32,7 @@ const SortableColumnHeader = ({
       gap={1}
       cursor="pointer"
       userSelect="none"
+      justifyContent={justifyContent}
       onClick={() => onSortChange(sortKey)}
       _hover={{ color: "gray.700" }}
     >
