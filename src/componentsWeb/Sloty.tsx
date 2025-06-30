@@ -575,7 +575,49 @@ const Sloty = () => {
 
               {/* GODZINA */}
               <Table.Cell textAlign="center">
-                <Text>{s.from}</Text>
+                <StyledSelect
+                  value={s.from || ""}
+                  bg="white"
+                  color="black"
+                  fontSize={{ base: 12, md: 14, lg: 16 }}
+                  height={10}
+                  textAlign={"center"}
+                  borderRadius={5}
+                  px={5}
+                  onChange={(e) => {
+                    dodajPoleDoMapy(s.id, "from");
+
+                    updateSlot(s.id, "from", e.target.value)
+                      .then(() => {
+                        toast({
+                          title: `Zmieniono godzinę rozpoczęcia`,
+                          description: `Nowa wartość: ${e.target.value}`,
+                          status: "success",
+                          duration: 3000,
+                          isClosable: true,
+                        });
+                      })
+                      .finally(() => {
+                        usunPoleZMapy(s.id, "from");
+                      });
+                  }}
+                >
+                  <option value="" disabled hidden>
+                    {slotyQuery.isLoading
+                      ? isMobile
+                        ? "Ładowanie..."
+                        : "Ładowanie godziny"
+                      : isMobile
+                      ? "Od"
+                      : "Od godziny"}
+                  </option>
+
+                  {dostepneGodzinyOd.map((godzina, index) => (
+                    <option key={index} value={godzina.toString()}>
+                      {godzina.toString()}
+                    </option>
+                  ))}
+                </StyledSelect>
               </Table.Cell>
 
               {/* SWITCH */}
