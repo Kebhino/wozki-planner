@@ -98,7 +98,7 @@ const Sloty = () => {
 
     return 0;
   });
-
+  
   const handleSortChange = (type: "slot" | "data" | "godzina") => {
     setSortConfig((prev) => {
       if (prev.type === type) {
@@ -529,6 +529,20 @@ const Sloty = () => {
               </Table.Cell>
               <Table.Cell>
                 <HStack>
+                  <DatePicker
+          selected={s.data}
+          locale="pl"
+          dateFormat="dd.MM.yyyy"
+          onChange={(date) => {
+            if (date) {
+            updateSlot(s.id, "data", date.toLocaleDateString("pl-PL", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    } ))
+          }}}
+          className="custom-datepicker"
+        />
                   <Text fontSize="sm">
                     {new Date(s.data).toLocaleDateString("pl-PL", {
                       day: "2-digit",
