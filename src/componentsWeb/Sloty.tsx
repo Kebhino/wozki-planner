@@ -57,6 +57,7 @@ const Sloty = () => {
     name: "",
     data: new Date(),
     active: true,
+    lokalizacjaId: "",
     from: 0,
     to: undefined,
     suggestedTo: undefined,
@@ -117,17 +118,18 @@ const Sloty = () => {
   };
 
   const handleAddSlot = async () => {
-    if (
-      typeof newSlot.name !== "string" ||
-      !newSlot.name.trim() ||
-      newSlot.from === 0
-    ) {
+    const brakLokalizacji =
+      typeof newSlot.lokalizacjaId !== "string" ||
+      !newSlot.lokalizacjaId.trim();
+
+    const brakGodziny = newSlot.from === 0;
+
+    if (brakLokalizacji || brakGodziny) {
       toast({
         title:
-          (typeof newSlot.name !== "string" || !newSlot.name.trim()) &&
-          newSlot.from === 0
+          brakLokalizacji && brakGodziny
             ? "Wybierz lokalizację i godzinę"
-            : typeof newSlot.name !== "string" || !newSlot.name.trim()
+            : brakLokalizacji
             ? "Wybierz lokalizację"
             : "Wybierz godzinę",
         status: "warning",
@@ -164,6 +166,7 @@ const Sloty = () => {
         name: "",
         data: new Date(),
         active: true,
+        lokalizacjaId: "",
         from: 0,
         to: undefined,
         suggestedTo: undefined,
@@ -275,7 +278,7 @@ const Sloty = () => {
 
       <HStack gap={2}>
         <StyledSelect
-          value={newSlot.name}
+          value={newSlot.lokalizacjaId}
           bg="white"
           color="black"
           fontSize={{ base: 12, md: 14, lg: 16 }}
@@ -286,7 +289,7 @@ const Sloty = () => {
           onChange={(e) =>
             setNewSlot((prev) => ({
               ...prev,
-              name: e.target.value,
+              lokalizacjaId: e.target.value,
             }))
           }
         >
@@ -303,7 +306,7 @@ const Sloty = () => {
           {lokalizacjeData
             .filter((lokalizacja) => lokalizacja.active)
             .map((lokalizacja) => (
-              <option key={lokalizacja.name} value={lokalizacja.name}>
+              <option key={lokalizacja.id} value={lokalizacja.id}>
                 {lokalizacja.name}
               </option>
             ))}
