@@ -586,12 +586,13 @@ const Sloty = () => {
                   px={5}
                   onChange={(e) => {
                     dodajPoleDoMapy(s.id, "from");
+                    const nowaGodzina = parseInt(e.target.value);
 
-                    updateSlot(s.id, "from", parseInt(e.target.value))
+                    updateSlot(s.id, "from", nowaGodzina)
                       .then(() => {
                         toast({
                           title: `Zmieniono godzinę rozpoczęcia`,
-                          description: `Nowa wartość: ${e.target.value}`,
+                          description: `Nowa wartość: ${nowaGodzina}`,
                           status: "success",
                           duration: 3000,
                           isClosable: true,
