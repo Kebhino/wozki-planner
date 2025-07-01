@@ -575,50 +575,54 @@ const Sloty = () => {
 
               {/* GODZINA */}
               <Table.Cell textAlign="center">
-                <StyledSelect
-                  value={s.from || ""}
-                  bg="white"
-                  color="black"
-                  fontSize={{ base: 12, md: 14, lg: 16 }}
-                  height={10}
-                  textAlign={"center"}
-                  borderRadius={5}
-                  px={5}
-                  onChange={(e) => {
-                    dodajPoleDoMapy(s.id, "from");
-                    const nowaGodzina = parseInt(e.target.value);
+                {sprawdzCzyEdytowane(s.id, "from") ? (
+                  <Spinner />
+                ) : (
+                  <StyledSelect
+                    value={s.from || ""}
+                    bg="white"
+                    color="black"
+                    fontSize={{ base: 12, md: 14, lg: 16 }}
+                    height={10}
+                    textAlign={"center"}
+                    borderRadius={5}
+                    px={5}
+                    onChange={(e) => {
+                      dodajPoleDoMapy(s.id, "from");
+                      const nowaGodzina = parseInt(e.target.value);
 
-                    updateSlot(s.id, "from", nowaGodzina)
-                      .then(() => {
-                        toast({
-                          title: `Zmieniono godzinę rozpoczęcia`,
-                          description: `Nowa wartość: ${nowaGodzina}`,
-                          status: "success",
-                          duration: 3000,
-                          isClosable: true,
+                      updateSlot(s.id, "from", nowaGodzina)
+                        .then(() => {
+                          toast({
+                            title: `Zmieniono godzinę rozpoczęcia`,
+                            description: `Nowa wartość: ${nowaGodzina}`,
+                            status: "success",
+                            duration: 3000,
+                            isClosable: true,
+                          });
+                        })
+                        .finally(() => {
+                          usunPoleZMapy(s.id, "from");
                         });
-                      })
-                      .finally(() => {
-                        usunPoleZMapy(s.id, "from");
-                      });
-                  }}
-                >
-                  <option value="" disabled hidden>
-                    {slotyQuery.isLoading
-                      ? isMobile
-                        ? "Ładowanie..."
-                        : "Ładowanie godziny"
-                      : isMobile
-                      ? "Od"
-                      : "Od godziny"}
-                  </option>
-
-                  {dostepneGodzinyOd.map((godzina, index) => (
-                    <option key={index} value={godzina.toString()}>
-                      {godzina.toString()}
+                    }}
+                  >
+                    <option value="" disabled hidden>
+                      {slotyQuery.isLoading
+                        ? isMobile
+                          ? "Ładowanie..."
+                          : "Ładowanie godziny"
+                        : isMobile
+                        ? "Od"
+                        : "Od godziny"}
                     </option>
-                  ))}
-                </StyledSelect>
+
+                    {dostepneGodzinyOd.map((godzina, index) => (
+                      <option key={index} value={godzina.toString()}>
+                        {godzina.toString()}
+                      </option>
+                    ))}
+                  </StyledSelect>
+                )}
               </Table.Cell>
 
               {/* SWITCH */}
