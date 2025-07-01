@@ -220,7 +220,7 @@ const Sloty = () => {
   const updateSlot = async (
     id: string,
     field: keyof Slot,
-    value: string | boolean
+    value: string | boolean | number
   ) => {
     try {
       await updateSlotInDb(id, field, value);
@@ -587,7 +587,7 @@ const Sloty = () => {
                   onChange={(e) => {
                     dodajPoleDoMapy(s.id, "from");
 
-                    updateSlot(s.id, "from", e.target.value)
+                    updateSlot(s.id, "from", parseInt(e.target.value))
                       .then(() => {
                         toast({
                           title: `Zmieniono godzinę rozpoczęcia`,

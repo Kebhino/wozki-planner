@@ -31,7 +31,7 @@ export const getSlots = async (signal?: AbortSignal) => {
 export const updateSlotInDb = async (
   id: string,
   field: keyof Slot,
-  value: string | boolean
+  value: string | boolean | number 
 ) => {
   const res = await fetch(
     `https://gngp5xd4ol.execute-api.eu-central-1.amazonaws.com/sloty/${id}`,
