@@ -70,29 +70,35 @@ const Sloty = () => {
   const slotyData = slotyQuery.data || [];
   console.log("To są sloty przed sortowaniem", slotyData);
 
-  const sortedParticipants = [...slotyData].sort((a, b) => {
+  const posortowaneSloty = [...slotyData].sort((slotA, slotB) => {
     const { type, direction } = sortConfig;
 
     let valA: string | number;
     let valB: string | number;
 
     if (type === "slot") {
-      valA = a.name;
-      valB = b.name;
+      valA =
+        lokalizacjeData.find(
+          (lokalizacja) => lokalizacja.id === slotA.lokalizacjaId
+        )?.name || "";
+      valB =
+        lokalizacjeData.find(
+          (lokalizacja) => lokalizacja.id === slotB.lokalizacjaId
+        )?.name || "";
       return direction === "asc"
         ? valA.localeCompare(valB, "pl")
         : valB.localeCompare(valA, "pl");
     }
     if (type === "data") {
-      const timeA = a.data.getTime() + a.from * 3600000; // liczba milisekund
-      const timeB = b.data.getTime() + b.from * 3600000;
+      const timeA = slotA.data.getTime() + slotA.from * 3600000; // liczba milisekund
+      const timeB = slotB.data.getTime() + slotB.from * 3600000;
 
       return direction === "asc" ? timeA - timeB : timeB - timeA;
     }
 
     if (type === "godzina") {
-      const timeA = a.from;
-      const timeB = b.from;
+      const timeA = slotA.from;
+      const timeB = slotB.from;
 
       return direction === "asc" ? timeA - timeB : timeB - timeA;
     }
@@ -467,7 +473,7 @@ const Sloty = () => {
         </Table.Header>
 
         <Table.Body>
-          {sortedParticipants.map((s) => (
+          {posortowaneSloty.map((s) => (
             <Table.Row key={s.id}>
               {/* LOKALIZACJA */}
               <Table.Cell whiteSpace="normal">
