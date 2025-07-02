@@ -492,7 +492,7 @@ const Sloty = () => {
                             (lokalizacja) =>
                               lokalizacja.id === idWybranejLokalizacji
                           )?.name || "Nieznana";
-                        updateSlot(s.id, "lokalizacja", e.target.value)
+                        updateSlot(s.id, "lokalizacjaId", e.target.value)
                           .then(() =>
                             toast({
                               description: (
