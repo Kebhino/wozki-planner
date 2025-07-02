@@ -9,7 +9,7 @@ export interface AddSlotProps {
 }
 export interface Slot {
   id: string;
-  name: string;
+  lokalizacja: string;
   active: boolean
   lokalizacjaId: string
   data: Date

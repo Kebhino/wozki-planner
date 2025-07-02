@@ -54,7 +54,7 @@ const Sloty = () => {
     lg: "bottom",
   }) as ToastPosition;
   const [newSlot, setNewSlot] = useState<Omit<Slot, "id">>({
-    name: "",
+    lokalizacja: "",
     data: new Date(),
     active: true,
     lokalizacjaId: "",
@@ -171,7 +171,7 @@ const Sloty = () => {
 
       queryClient.invalidateQueries({ queryKey: ["sloty"] });
       setNewSlot({
-        name: "",
+        lokalizacja: "",
         data: new Date(),
         active: true,
         lokalizacjaId: "",
@@ -188,22 +188,22 @@ const Sloty = () => {
             : `Dodano ${ileSlotowDodac()} slotów`,
         description:
           ileSlotowDodac() === 1
-            ? `${newSlot.name} w dniu ${newSlot.data.toLocaleDateString(
-                "pl-PL",
-                {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                }
-              )} godzina: ${newSlot.from}`
-            : `${newSlot.name} w dniu ${newSlot.data.toLocaleDateString(
-                "pl-PL",
-                {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                }
-              )} od godziny: ${newSlot.from} do ${newSlot.to}`,
+            ? `${
+                lokalizacjeData.find((l) => l.id === newSlot.lokalizacjaId)
+                  ?.name
+              } w dniu ${newSlot.data.toLocaleDateString("pl-PL", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })} godzina: ${newSlot.from}`
+            : `${
+                lokalizacjeData.find((l) => l.id === newSlot.lokalizacjaId)
+                  ?.name
+              } w dniu ${newSlot.data.toLocaleDateString("pl-PL", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })} od godziny: ${newSlot.from} do ${newSlot.to}`,
         status: "success",
         duration: 4000,
         isClosable: true,
@@ -478,20 +478,21 @@ const Sloty = () => {
               {/* LOKALIZACJA */}
               <Table.Cell whiteSpace="normal">
                 <Box maxW="100%" overflowX="auto">
-                  {!sprawdzCzyEdytowane(s.id, "name") ? (
+                  {!sprawdzCzyEdytowane(s.id, "lokalizacja") ? (
                     <StyledSelect
                       value={s.lokalizacjaId}
                       w="100%"
                       fontSize={{ base: "xs", md: "sm", lg: "sm" }}
                       onChange={(e) => {
-                        dodajPoleDoMapy(s.id, "name");
+                        dodajPoleDoMapy(s.id, "lokalizacja");
                         let idWybranejLokalizacji = e.target.value;
 
-                        let nazwalokalizacji = lokalizacjeData.find(
-                          (lokalizacja) =>
-                            lokalizacja.id === idWybranejLokalizacji
-                        )?.name;
-                        updateSlot(s.id, "lokalizacjaId", e.target.value)
+                        let nazwalokalizacji =
+                          lokalizacjeData.find(
+                            (lokalizacja) =>
+                              lokalizacja.id === idWybranejLokalizacji
+                          )?.name || "Nieznana";
+                        updateSlot(s.id, "lokalizacja", e.target.value)
                           .then(() =>
                             toast({
                               description: (
@@ -502,13 +503,13 @@ const Sloty = () => {
                                     fontWeight="bold"
                                     display="inline"
                                   >
-                                    {nazwalokalizacji || "Nieznana"}
+                                    {nazwalokalizacji}
                                   </Text>
                                 </Text>
                               ),
                             })
                           )
-                          .finally(() => usunPoleZMapy(s.id, "name"));
+                          .finally(() => usunPoleZMapy(s.id, "lokalizacja"));
                       }}
                     >
                       <option value="" disabled={!lokalizacjeQuery.isLoading}>
@@ -711,7 +712,10 @@ const Sloty = () => {
                           </Dialog.Header>
                           <Dialog.Body>
                             <Text fontWeight="bold" textAlign="center" mt={5}>
-                              {s.name}
+                              {lokalizacjeData.find(
+                                (lokalizacja) =>
+                                  lokalizacja.id === s.lokalizacjaId
+                              )?.name || "Nieznana"}
                               <br />
                               {s.data.toLocaleDateString("pl-PL", {
                                 day: "2-digit",
@@ -723,7 +727,13 @@ const Sloty = () => {
                             </Text>
                             {s.active && (
                               <Text textAlign="center" color="red" pt={5}>
-                                <b>{s.name}</b> jest oznaczony jako aktywny
+                                <b>
+                                  {lokalizacjeData.find(
+                                    (lokalizacja) =>
+                                      lokalizacja.id === s.lokalizacjaId
+                                  )?.name || "Nieznana"}
+                                </b>{" "}
+                                jest oznaczony jako aktywny
                               </Text>
                             )}
                           </Dialog.Body>
