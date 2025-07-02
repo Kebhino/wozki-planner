@@ -485,6 +485,12 @@ const Sloty = () => {
                       fontSize={{ base: "xs", md: "sm", lg: "sm" }}
                       onChange={(e) => {
                         dodajPoleDoMapy(s.id, "name");
+                        let idWybranejLokalizacji = e.target.value;
+
+                        let nazwalokalizacji = lokalizacjeData.find(
+                          (lokalizacja) =>
+                            lokalizacja.id === idWybranejLokalizacji
+                        )?.name;
                         updateSlot(s.id, "lokalizacjaId", e.target.value)
                           .then(() =>
                             toast({
@@ -496,7 +502,7 @@ const Sloty = () => {
                                     fontWeight="bold"
                                     display="inline"
                                   >
-                                    {e.target.value}
+                                    {nazwalokalizacji || "Nieznana"}
                                   </Text>
                                 </Text>
                               ),
